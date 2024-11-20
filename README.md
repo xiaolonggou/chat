@@ -1,16 +1,22 @@
-# chat
+# Chat App
 
-A new Flutter project.
+A simple Flutter application that simulates a chat interface, including mock data for chats, chatters, and scenes. The app allows users to view a list of chat threads, each labeled with participants, scene, and the last message. It also provides an option to add new chats using a floating action button.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- View a list of chats with details:
+  - Participants
+  - Scene context
+  - Last message
+- Floating action button to add a new chat (currently mock functionality)
+- Navigation through 4 main sections: 
+  - Chats
+  - Chatters
+  - Scenes
+  - Settings
 
-A few resources to get you started if this is your first Flutter project:
+## Installation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/chat-app.git
