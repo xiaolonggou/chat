@@ -1,11 +1,6 @@
 import '../../data/mock_scenes_repository.dart';
-
 import 'scene_model.dart';
 
-// lib/features/scenes/scenes_controller.dart
-
-import 'scene_model.dart';
-import '../../data/mock_scenes_repository.dart';
 
 class ScenesController {
   final MockScenesRepository _repository;

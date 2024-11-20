@@ -1,5 +1,6 @@
 import 'package:chat/features/chatters/chatters_page.dart';
 import 'package:chat/features/scenes/scenes_page.dart';
+import 'package:chat/features/chats/chats_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -35,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = PlaceholderPage(title: 'Chats');
+        page = ChatsPage();
         break;
       case 1:
         page = ChattersPage();
