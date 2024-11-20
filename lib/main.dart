@@ -1,3 +1,5 @@
+import 'package:chat/features/chatters/chatters_page.dart';
+import 'package:chat/features/scenes/scenes_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,17 +36,24 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (selectedIndex) {
       case 0:
         page = PlaceholderPage(title: 'Chats');
+        break;
       case 1:
-        page = PlaceholderPage(title: 'Chatters');
+        page = ChattersPage();
+        break;
       case 2:
-        page = PlaceholderPage(title: 'Scenes');
+        page = ScenesPage();
+        break;
       case 3:
         page = PlaceholderPage(title: 'Settings');
+        break;
       default:
         throw UnimplementedError('No widget for index $selectedIndex');
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Chat App'),
+      ),
       body: Container(
         color: Theme.of(context).colorScheme.primaryContainer,
         child: page,
