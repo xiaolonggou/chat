@@ -46,6 +46,16 @@ class _ScenesPageState extends State<ScenesPage> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Handle adding a new scene
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Adding a new scene...')),
+          );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
     );
   }
 }

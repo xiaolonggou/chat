@@ -1,4 +1,5 @@
 import 'package:chat/features/chatters/chatters_page.dart';
+import 'package:chat/features/settings/settings_page.dart';
 import 'package:chat/features/scenes/scenes_page.dart';
 import 'package:chat/features/chats/chats_page.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = ScenesPage();
         break;
       case 3:
-        page = PlaceholderPage(title: 'Settings');
+        page = SettingsPage();
         break;
       default:
         throw UnimplementedError('No widget for index $selectedIndex');

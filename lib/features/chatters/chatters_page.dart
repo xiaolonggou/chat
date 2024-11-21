@@ -51,6 +51,16 @@ class ChattersPage extends StatelessWidget {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Handle adding a new chatter
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Adding a new chatter...')),
+          );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
     );
   }
 }
