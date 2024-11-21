@@ -66,27 +66,24 @@ class ChatsPage extends StatelessWidget {
             child: ListTile(
               contentPadding: EdgeInsets.all(10),
               title: Text(
-                'Scene: ${chat.scene}',
-                style: Theme.of(context).textTheme.titleLarge, // Updated style here
+                chat.scene,
+                style: Theme.of(context).textTheme.titleMedium, // Updated style here
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Participants: ${chat.participants.join(', ')}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    chat.participants.join(', '),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Last Message: ${chat.lastMessage}',
+                    chat.lastMessage,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
               ),
-              leading: CircleAvatar(
-                child: Icon(Icons.chat_bubble_outline),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
+              
               onTap: () {
                 // Handle chat thread click here (not yet defined)
               },
