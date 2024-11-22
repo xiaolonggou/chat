@@ -21,7 +21,6 @@ lib/
 │   │   ├── chatters_model.dart
 │   │   ├── chatters_page.dart
 │   │   ├── chatters_repository.dart
-│   │   ├── chatters_widgets.dart
 │   │   └── edit_chatter_page.dart
 │   ├── scenes/
 │   │   ├── edit_scene_page.dart
