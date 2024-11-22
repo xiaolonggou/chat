@@ -1,0 +1,34 @@
+My file structure is:
+lib/
+├── data/
+│   ├── mock_chatters_repository.dart
+│   ├── mock_scenes_repository.dart
+├── features/
+│   ├── chats/
+│   │   ├── chat_model.dart
+│   │   ├── chat_page.dart
+│   │   └── chats_page.dart
+│   ├── chatters/
+│   │   ├── chatters_controller.dart
+│   │   ├── chatters_model.dart
+│   │   ├── chatters_page.dart
+│   │   ├── chatters_repository.dart
+│   │   ├── chatters_widgets.dart
+│   │   └── edit_chatter_page.dart
+│   ├── scenes/
+│   │   ├── edit_scene_page.dart
+│   │   ├── scene_model.dart
+│   │   ├── scenes_controller.dart
+│   │   └── scenes_page.dart
+├── settings/
+│   └── (Add your settings files here if applicable)
+├── shared/
+│   ├── themes/
+│   │   └── themes.dart
+│   ├── utils/
+│   │   └── utils.dart
+│   └── widgets/
+│       └── widgets.dart
+└── main.dart
+
+Please print coding and specify in which file the coding should be. Please print in full file length.
