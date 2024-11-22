@@ -3,8 +3,8 @@ import '../features/chatters/chatters_model.dart';
 
 class MockChattersRepository {
   final List<Chatter> _mockChatters = [
-    Chatter(id:'1', name: 'Alice', gender: 'Female', yearOfBirth: 1990, job: 'Engineer', personality: 'Friendly'),
-    Chatter(id:'2', name: 'Bob', gender: 'Male', yearOfBirth: 1985, job: 'Doctor', personality: 'Calm'),
+    Chatter(id:1, name: 'Alice', gender: 'Female', yearOfBirth: 1990, job: 'Engineer', personality: 'Friendly'),
+    Chatter(id:2, name: 'Bob', gender: 'Male', yearOfBirth: 1985, job: 'Doctor', personality: 'Calm'),
   ];
 
   Future<List<Chatter>> fetchChatters() async {

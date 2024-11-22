@@ -1,7 +1,7 @@
 // Data model(s) for Chatters
 
 class Chatter {
-  String id;
+  int id;
   String name;
   String gender;
   int yearOfBirth;

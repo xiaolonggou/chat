@@ -46,7 +46,7 @@ class ChattersPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => EditChatterPage(chatter: Chatter(
-                id: '',
+                id: 0,
                 name: '', // Empty name for new chatter
                 gender: 'Unknown',
                 yearOfBirth: 2000,
