@@ -1,4 +1,12 @@
-My file structure is:
+My challenge:
+I am not sure if my Chatter widget should be stateful or not. 
+The chatters should be stored in a backend and editable and managable in my app.
+What is your suggestion? Please consider also for development time, I would like to use mock data.
+
+My request:
+Please print coding and specify in which file the coding should be. Please print in full file length for places of change.
+
+My file structure:
 lib/
 ├── data/
 │   ├── mock_chatters_repository.dart
@@ -31,4 +39,4 @@ lib/
 │       └── widgets.dart
 └── main.dart
 
-Please print coding and specify in which file the coding should be. Please print in full file length.
+Which source code do you need to generate a perfect answer?

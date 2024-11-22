@@ -20,3 +20,6 @@ A simple Flutter application that simulates a chat interface, including mock dat
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/chat-app.git
+
+## Developer note
+1. run 'dart combine_code.dart' to generate a full prompt.
