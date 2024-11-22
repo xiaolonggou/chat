@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chatters_model.dart';
 import 'chatters_controller.dart';
+import '../../shared/utils/utils.dart'; // Import the utils.dart file
 
 class EditChatterPage extends StatefulWidget {
   final Chatter? chatter; // Nullable to handle both add and edit
@@ -42,6 +43,9 @@ class _EditChatterPageState extends State<EditChatterPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Use the utility function to get the hint text for Personality
+    String personalityHint = getPersonalityHintText(_personalityController.text);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.chatter == null ? 'Add Chatter' : 'Edit Chatter')),
       body: Padding(
@@ -79,10 +83,23 @@ class _EditChatterPageState extends State<EditChatterPage> {
               controller: _jobController,
               decoration: InputDecoration(labelText: 'Job'),
             ),
+            // Personality field
             TextField(
               controller: _personalityController,
               decoration: InputDecoration(labelText: 'Personality'),
             ),
+            // Show hint if Personality is empty
+            if (personalityHint.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  personalityHint,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
