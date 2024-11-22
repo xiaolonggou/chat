@@ -1,61 +1,110 @@
 import 'package:flutter/material.dart';
-import 'chatters_model.dart'; // Chatter model
+import 'package:provider/provider.dart';
+import 'chatters_model.dart';
+import 'chatters_controller.dart';
 
-class EditChatterPage extends StatelessWidget {
-  final Chatter chatter;
+class EditChatterPage extends StatefulWidget {
+  final Chatter? chatter; // Nullable to handle both add and edit
 
-  const EditChatterPage({super.key, required this.chatter});
+  EditChatterPage({required this.chatter});
+
+  @override
+  _EditChatterPageState createState() => _EditChatterPageState();
+}
+
+class _EditChatterPageState extends State<EditChatterPage> {
+  late TextEditingController _nameController;
+  late TextEditingController _yearOfBirthController;
+  late TextEditingController _jobController;
+  late TextEditingController _personalityController;
+  String? _selectedGender; // Store the selected gender
+
+  final List<String> _genders = ['Male', 'Female', 'Unknown', 'Other']; // Gender options
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.chatter?.name ?? '');
+    _yearOfBirthController = TextEditingController(text: widget.chatter?.yearOfBirth.toString() ?? '2000');
+    _jobController = TextEditingController(text: widget.chatter?.job ?? 'Unknown');
+    _personalityController = TextEditingController(text: widget.chatter?.personality ?? 'Neutral');
+    _selectedGender = widget.chatter?.gender ?? 'Unknown'; // Initialize the gender field
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _yearOfBirthController.dispose();
+    _jobController.dispose();
+    _personalityController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    final TextEditingController nameController = TextEditingController(text: chatter.name);
-    final TextEditingController genderController = TextEditingController(text: chatter.gender);
-    final TextEditingController yearOfBirthController = TextEditingController(text: chatter.yearOfBirth.toString());
-    final TextEditingController jobController = TextEditingController(text: chatter.job);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Chatter: ${chatter.name}'),
-      ),
+      appBar: AppBar(title: Text(widget.chatter == null ? 'Add Chatter' : 'Edit Chatter')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-              ),
-              TextFormField(
-                controller: genderController,
-                decoration: InputDecoration(labelText: 'Gender'),
-              ),
-              TextFormField(
-                controller: yearOfBirthController,
-                decoration: InputDecoration(labelText: 'Year of Birth'),
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: jobController,
-                decoration: InputDecoration(labelText: 'Job'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Logic to save changes can go here, like updating the chatter data
-                  // For now, it just prints the updated data
-                  if (_formKey.currentState!.validate()) {
-                    print('Updated Chatter: ${nameController.text}, ${genderController.text}, ${yearOfBirthController.text}, ${jobController.text}');
-                    // You would typically save the changes to the repository or API here.
-                  }
-                },
-                child: Text('Save Changes'),
-              ),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Name'),
+            ),
+            // Gender dropdown
+            DropdownButtonFormField<String>(
+              value: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                });
+              },
+              decoration: InputDecoration(labelText: 'Gender'),
+              items: _genders.map((gender) {
+                return DropdownMenuItem<String>(
+                  value: gender,
+                  child: Text(gender),
+                );
+              }).toList(),
+            ),
+            // Year of birth input field
+            TextField(
+              controller: _yearOfBirthController,
+              decoration: InputDecoration(labelText: 'Year of Birth'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _jobController,
+              decoration: InputDecoration(labelText: 'Job'),
+            ),
+            TextField(
+              controller: _personalityController,
+              decoration: InputDecoration(labelText: 'Personality'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Create a new or updated chatter object
+                final updatedChatter = Chatter(
+                  id: widget.chatter?.id ?? DateTime.now().toString(), // Use the existing id if editing, otherwise generate a new one
+                  name: _nameController.text,
+                  gender: _selectedGender ?? 'Unknown', // Use selected gender
+                  yearOfBirth: int.tryParse(_yearOfBirthController.text) ?? 2000,
+                  job: _jobController.text,
+                  personality: _personalityController.text,
+                );
+
+                // Call the controller to save the changes
+                Provider.of<ChattersController>(context, listen: false).addOrUpdateChatter(updatedChatter);
+
+                // Go back to the previous page (ChattersPage)
+                Navigator.pop(context);
+              },
+              child: Text(widget.chatter == null ? 'Add Chatter' : 'Save Changes'),
+            ),
+          ],
         ),
       ),
     );

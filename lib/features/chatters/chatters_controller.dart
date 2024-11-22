@@ -33,8 +33,8 @@ class ChattersController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await repository.saveChatter(chatter);
-      await fetchChatters();
+      await repository.saveChatter(chatter); // Update or add chatter in the repository
+      await fetchChatters(); // Refresh the chatters list after saving
     } catch (e) {
       error = e.toString();
     } finally {

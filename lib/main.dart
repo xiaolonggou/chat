@@ -3,9 +3,17 @@ import 'package:chat/features/settings/settings_page.dart';
 import 'package:chat/features/scenes/scenes_page.dart';
 import 'package:chat/features/chats/chats_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Import the provider package
+import 'features/chatters/chatters_controller.dart';
+import 'data/mock_chatters_repository.dart'; // Import the mock repository
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ChattersController(repository: MockChattersRepository()),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,7 +27,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: MyHomePage(),
+      home:  MyHomePage(),
     );
   }
 }
