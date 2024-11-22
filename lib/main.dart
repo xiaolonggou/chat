@@ -46,16 +46,12 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (selectedIndex) {
       case 0:
         page = ChatsPage();
-        break;
       case 1:
         page = ChattersPage();
-        break;
       case 2:
         page = ScenesPage();
-        break;
       case 3:
         page = SettingsPage();
-        break;
       default:
         throw UnimplementedError('No widget for index $selectedIndex');
     }
@@ -93,22 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Settings',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-
-  const PlaceholderPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.headlineLarge,
       ),
     );
   }
