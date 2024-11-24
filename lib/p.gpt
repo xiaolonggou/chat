@@ -1,7 +1,6 @@
 My challenge:
-I am not sure if my Chatter widget should be stateful or not. 
-The chatters should be stored in a backend and editable and managable in my app.
-What is your suggestion? Please consider also for development time, I would like to use mock data.
+I would like to use the backend on my local pc, for example http://localhost:3000/api/chatters.
+Currently I am using the mock_chatters_repository. I would like to have a global boolean used in ChattersController, which controls if mock data or API usage.
 
 My request:
 Please print coding and specify in which file the coding should be. Please print in full file length for places of change.

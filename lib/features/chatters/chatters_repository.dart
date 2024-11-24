@@ -1,14 +1,9 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+// lib/features/chatters/chatters_repository.dart
 
-class ChattersRepository {
-  Future<List<String>> fetchChatters() async {
-    final response = await http.get(Uri.parse('https://example.com/chatters'));
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((chatter) => chatter['name'] as String).toList();
-    } else {
-      throw Exception('Failed to load chatters');
-    }
-  }
+import 'chatters_model.dart';
+
+abstract class ChattersRepository {
+  Future<List<Chatter>> fetchChatters();
+  Future<void> saveChatter(Chatter chatter);
+  Future<void> deleteChatter(int id);
 }
