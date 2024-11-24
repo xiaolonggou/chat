@@ -4,11 +4,11 @@ import 'package:chat/features/settings/settings_page.dart';
 import 'package:chat/features/scenes/scenes_page.dart';
 import 'package:chat/features/chats/chats_page.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // Missing import for http
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart'; // Import the provider package
 import 'features/chatters/chatters_controller.dart';
 import 'data/mock_chatters_repository.dart';
-import 'features/chatters/chatters_repository.dart'; // Import the repository interface
+import 'features/chatters/chatters_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,15 +47,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chat App',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      ),
-      home: ChangeNotifierProvider(
-        create: (_) => chattersController,
-        child: MyHomePage(),
+    return ChangeNotifierProvider(
+      create: (_) => chattersController,  // Provide the controller here
+      child: MaterialApp(
+        title: 'Chat App',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        ),
+        home: MyHomePage(), // The home page of your app
       ),
     );
   }
@@ -67,7 +67,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int selectedIndex = 0; // Initialized selectedIndex
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -75,16 +75,16 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (selectedIndex) {
       case 0:
         page = ChatsPage();
-        break; // Added break
+        break;
       case 1:
         page = ChattersPage();
-        break; // Added break
+        break;
       case 2:
         page = ScenesPage();
-        break; // Added break
+        break;
       case 3:
         page = SettingsPage();
-        break; // Added break
+        break;
       default:
         throw UnimplementedError('No widget for index $selectedIndex');
     }
@@ -101,9 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
             selectedIndex = value;
           });
         },
-        selectedItemColor: Theme.of(context).colorScheme.primary, // Highlighted icon color
-        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant, // Non-selected icon color
-        backgroundColor: Theme.of(context).colorScheme.surface, // Bar background color
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
