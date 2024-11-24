@@ -105,7 +105,6 @@ class _EditChatterPageState extends State<EditChatterPage> {
               onPressed: () {
                 // Create a new or updated chatter object
                 final updatedChatter = Chatter(
-                  id: widget.chatter?.id ?? DateTime.now().millisecondsSinceEpoch, // Use the existing id if editing, otherwise generate a new one
                   name: _nameController.text,
                   gender: _selectedGender ?? 'Unknown', // Use selected gender
                   yearOfBirth: int.tryParse(_yearOfBirthController.text) ?? 2000,

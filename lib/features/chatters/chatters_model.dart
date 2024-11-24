@@ -1,7 +1,7 @@
 // lib/features/chatters/chatters_model.dart
 
 class Chatter {
-  int id;
+  int? id;
   String name;
   String gender;
   int yearOfBirth;
@@ -9,7 +9,7 @@ class Chatter {
   String personality; // Added field for simulating thought/speech patterns
 
   Chatter({
-    required this.id,
+    this.id,
     required this.name,
     required this.gender,
     required this.yearOfBirth,
@@ -20,7 +20,7 @@ class Chatter {
   // Factory constructor for creating a Chatter instance from JSON
   factory Chatter.fromJson(Map<String, dynamic> json) {
     return Chatter(
-      id: json['id'] as int,
+      id: json['id'],
       name: json['name'] as String,
       gender: json['gender'] as String,
       yearOfBirth: json['year_of_birth'] as int,
@@ -30,14 +30,15 @@ class Chatter {
   }
 
   // Method for converting a Chatter instance to JSON
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {
-      'id': id,
+      if (id != null) 'id': id, // Include 'id' only if it is not null
       'name': name,
       'gender': gender,
-      'year_of_birth': yearOfBirth,
+      'yearOfBirth': yearOfBirth,
       'job': job,
       'personality': personality,
     };
   }
+
 }

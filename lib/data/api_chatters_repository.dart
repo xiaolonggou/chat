@@ -36,7 +36,7 @@ Future<void> saveChatter(Chatter chatter) async {
       : http.post(
           url,
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(chatter.toJson()),
+          body: jsonEncode(chatter.toJson()..remove('id')),
         ));
 
   if (response.statusCode != 200) {
