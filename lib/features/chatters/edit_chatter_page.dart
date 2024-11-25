@@ -26,7 +26,7 @@ class _EditChatterPageState extends State<EditChatterPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.chatter?.name ?? '');
-    _yearOfBirthController = TextEditingController(text: widget.chatter?.yearOfBirth.toString() ?? '2000');
+    _yearOfBirthController = TextEditingController(text: widget.chatter?.yearOfBirth.toString() ?? 'Unkown');
     _jobController = TextEditingController(text: widget.chatter?.job ?? 'Unknown');
     _personalityController = TextEditingController(text: widget.chatter?.personality ?? 'Neutral');
     _selectedGender = widget.chatter?.gender ?? 'Unknown'; // Initialize the gender field
@@ -105,6 +105,7 @@ class _EditChatterPageState extends State<EditChatterPage> {
               onPressed: () {
                 // Create a new or updated chatter object
                 final updatedChatter = Chatter(
+                  id: widget.chatter?.id,
                   name: _nameController.text,
                   gender: _selectedGender ?? 'Unknown', // Use selected gender
                   yearOfBirth: int.tryParse(_yearOfBirthController.text) ?? 2000,

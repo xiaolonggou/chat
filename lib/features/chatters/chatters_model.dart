@@ -3,7 +3,7 @@ class Chatter {
   final int? id;
   final String name;
   final String gender;
-  final int yearOfBirth;
+  final int? yearOfBirth;
   final String job;
   final String personality;
 
@@ -11,7 +11,7 @@ class Chatter {
     this.id,
     required this.name,
     required this.gender,
-    required this.yearOfBirth,
+    this.yearOfBirth,
     required this.job,
     required this.personality,
   });
@@ -22,7 +22,7 @@ class Chatter {
       id: json['id'] as int?, // Nullable id
       name: json['name'] as String? ?? 'Unknown', // Default to 'Unknown' if null
       gender: json['gender'] as String? ?? 'Unknown', // Default to 'Unknown' if null
-      yearOfBirth: json['yearOfBirth'] as int? ?? 2000, // Default to 2000 if null
+      yearOfBirth: json['year_of_birth'] as int? ?? 2000,
       job: json['job'] as String? ?? 'Unemployed', // Default to 'Unemployed' if null
       personality: json['personality'] as String? ?? 'Neutral', // Default to 'Neutral' if null
     );
@@ -34,7 +34,7 @@ class Chatter {
       if (id != null) 'id': id, // Include id only if not null
       'name': name,
       'gender': gender,
-      'yearOfBirth': yearOfBirth,
+      'year_of_birth': yearOfBirth,
       'job': job,
       'personality': personality,
     };

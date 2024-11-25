@@ -5,7 +5,7 @@ import 'package:chat/main.dart';
 void main() {
   testWidgets('BottomNavigationBar item interaction test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    var chattersController = null;
+    var chattersController;
     await tester.pumpWidget(MyApp(chattersController: chattersController, useMockData: true));
 
     // Verify that the Chats page is shown by default.
