@@ -17,7 +17,7 @@ void main() async {
 
   final ChattersRepository repository = useMockData
       ? MockChattersRepository()
-      : ApiChattersRepository(baseUrl: serverUrl + '/api'); // Use the appropriate repository
+      : ApiChattersRepository(baseUrl: '$serverUrl/api'); // Use the appropriate repository
 
   final chattersController = ChattersController(repository: repository);
 
@@ -75,16 +75,12 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (selectedIndex) {
       case 0:
         page = ChatsPage();
-        break;
       case 1:
         page = ChattersPage();
-        break;
       case 2:
         page = ScenesPage();
-        break;
       case 3:
         page = SettingsPage();
-        break;
       default:
         throw UnimplementedError('No widget for index $selectedIndex');
     }

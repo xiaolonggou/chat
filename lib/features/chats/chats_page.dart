@@ -154,8 +154,8 @@ class _ChatsPageState extends State<ChatsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addNewChat(context),
-        child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        child: const Icon(Icons.add),
       ),
     );
   }

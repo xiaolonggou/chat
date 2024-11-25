@@ -53,8 +53,8 @@ class _ScenesPageState extends State<ScenesPage> {
             const SnackBar(content: Text('Adding a new scene...')),
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        child: const Icon(Icons.add),
       ),
     );
   }
