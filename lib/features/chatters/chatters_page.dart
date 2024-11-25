@@ -55,7 +55,7 @@ class ChattersPage extends StatelessWidget {
                 // Alternate background color using theme
                 final backgroundColor = index % 2 == 0
                     ? theme.colorScheme.inversePrimary.withOpacity(0.1) // Light surface color
-                    : theme.colorScheme.primary.withOpacity(0.1); // Slightly darker surface color
+                    : theme.colorScheme.inversePrimary.withOpacity(0.3); // Slightly darker surface color
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0), // Spacing between items
