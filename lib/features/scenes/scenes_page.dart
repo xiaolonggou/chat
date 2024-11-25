@@ -34,8 +34,8 @@ class _ScenesPageState extends State<ScenesPage> {
                 );
               },
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              child: const Icon(Icons.add),
               elevation: 0,
+              child: const Icon(Icons.add),
             ),
           ],
         ),

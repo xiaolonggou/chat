@@ -34,8 +34,8 @@ class ChattersPage extends StatelessWidget {
                 ).then((_) => Provider.of<ChattersController>(context, listen: false).fetchChatters());
               },
               backgroundColor: theme.colorScheme.inversePrimary,
-              child: const Icon(Icons.add),
-              elevation: 0, // Keep flat for app bar style consistency
+              elevation: 0,
+              child: const Icon(Icons.add), // Keep flat for app bar style consistency
             ),
           ],
         ),
