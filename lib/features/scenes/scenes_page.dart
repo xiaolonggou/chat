@@ -22,8 +22,24 @@ class _ScenesPageState extends State<ScenesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Scenes'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Scenes'),
+            FloatingActionButton.small(
+              onPressed: () {
+                // Handle adding a new scene
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Adding a new scene...')),
+                );
+              },
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
       ),
+
       body: ListView.builder(
         itemCount: _scenes.length,
         itemBuilder: (context, index) {
@@ -46,16 +62,7 @@ class _ScenesPageState extends State<ScenesPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle adding a new scene
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Adding a new scene...')),
-          );
-        },
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        child: const Icon(Icons.add),
-      ),
+      
     );
   }
 }

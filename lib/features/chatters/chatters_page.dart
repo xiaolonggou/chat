@@ -10,7 +10,36 @@ class ChattersPage extends StatelessWidget {
     final theme = Theme.of(context); // Access theme for consistent colors
 
     return Scaffold(
-      appBar: AppBar(title: Text('Chatters')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Chatters'),
+            FloatingActionButton.small(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditChatterPage(
+                      chatter: Chatter(
+                        id: null,
+                        name: '',
+                        gender: 'Unknown',
+                        yearOfBirth: 2000,
+                        job: 'Unknown',
+                        personality: 'Neutral',
+                      ),
+                    ),
+                  ),
+                ).then((_) => Provider.of<ChattersController>(context, listen: false).fetchChatters());
+              },
+              backgroundColor: theme.colorScheme.inversePrimary,
+              child: const Icon(Icons.add),
+              elevation: 0, // Keep flat for app bar style consistency
+            ),
+          ],
+        ),
+      ),
       body: Consumer<ChattersController>(
         builder: (context, controller, child) {
           if (controller.isLoading) {
@@ -83,27 +112,6 @@ class ChattersPage extends StatelessWidget {
             );
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditChatterPage(
-                chatter: Chatter(
-                  id: null,
-                  name: '',
-                  gender: 'Unknown',
-                  yearOfBirth: 2000,
-                  job: 'Unknown',
-                  personality: 'Neutral',
-                ),
-              ),
-            ),
-          ).then((_) => Provider.of<ChattersController>(context, listen: false).fetchChatters());
-        },
-        backgroundColor: theme.colorScheme.inversePrimary,
-        child: const Icon(Icons.add),
       ),
     );
   }
