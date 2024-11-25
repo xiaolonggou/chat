@@ -39,10 +39,11 @@ Future<void> saveChatter(Chatter chatter) async {
           body: jsonEncode(chatter.toJson()..remove('id')),
         ));
 
-  if (response.statusCode != 200) {
+  if (response.statusCode != 200 && response.statusCode != 201) {
     throw Exception('Failed to save chatter');
   }
 }
+
 
   @override
   Future<void> deleteChatter(int id) async {
