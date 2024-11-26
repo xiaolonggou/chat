@@ -18,6 +18,7 @@ class _EditScenePageState extends State<EditScenePage> {
   late TextEditingController _descriptionController;
   late TextEditingController _moodController;
   late TextEditingController _topicController;
+  late TextEditingController _languageController; // New controller for language
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _EditScenePageState extends State<EditScenePage> {
     _descriptionController = TextEditingController(text: widget.scene.description);
     _moodController = TextEditingController(text: widget.scene.mood);
     _topicController = TextEditingController(text: widget.scene.topic);
+    _languageController = TextEditingController(text: widget.scene.language); // Initialize with language
   }
 
   @override
@@ -37,6 +39,7 @@ class _EditScenePageState extends State<EditScenePage> {
     _descriptionController.dispose();
     _moodController.dispose();
     _topicController.dispose();
+    _languageController.dispose();
     super.dispose();
   }
 
@@ -68,6 +71,10 @@ class _EditScenePageState extends State<EditScenePage> {
                 controller: _topicController,
                 decoration: InputDecoration(labelText: 'Topic'),
               ),
+              TextFormField(
+                controller: _languageController,
+                decoration: InputDecoration(labelText: 'Language'),
+              ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveScene,
@@ -88,6 +95,7 @@ class _EditScenePageState extends State<EditScenePage> {
       description: _descriptionController.text,
       mood: _moodController.text,
       topic: _topicController.text,
+      language: _languageController.text,  // Updated language
     );
 
     // Update the scene using the MockScenesRepository

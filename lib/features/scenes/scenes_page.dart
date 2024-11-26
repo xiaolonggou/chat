@@ -15,7 +15,7 @@ class _ScenesPageState extends State<ScenesPage> {
   @override
   void initState() {
     super.initState();
-    _scenes = MockScenesRepository().getScenes(); // Load the scenes
+    _scenes = MockScenesRepository().getScenesByUserId("user123"); // Load the scenes
   }
 
   @override
