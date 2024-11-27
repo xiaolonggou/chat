@@ -1,8 +1,7 @@
-// lib/features/scenes/edit_scene_page.dart
-
 import 'package:flutter/material.dart';
 import 'scene_model.dart'; // Import the Scene model
-import '../../data/mock_scenes_repository.dart'; // Import the MockScenesRepository
+import 'package:provider/provider.dart'; // Import provider for ScenesController
+import 'scenes_controller.dart'; // Import the ScenesController
 
 class EditScenePage extends StatefulWidget {
   final Scene scene; // The scene to be edited
@@ -96,14 +95,20 @@ class _EditScenePageState extends State<EditScenePage> {
       mood: _moodController.text,
       topic: _topicController.text,
       language: _languageController.text, 
-      userId: widget.scene.userId,  // Updated language
+      userId: widget.scene.userId,  // Keep the userId
     );
 
-    // Update the scene using the MockScenesRepository
-    final repository = MockScenesRepository();
-    repository.updateScene(updatedScene);
+    // Use the ScenesController to update the scene via its repository
+    final controller = Provider.of<ScenesController>(context, listen: false);
 
-    // Navigate back to the previous page
-    Navigator.pop(context);
+    controller.saveScene(updatedScene).then((_) {
+      // On successful update, navigate back
+      Navigator.pop(context);
+    }).catchError((error) {
+      // Handle any errors (optional)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save scene: $error')),
+      );
+    });
   }
 }
