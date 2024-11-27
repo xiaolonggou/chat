@@ -95,7 +95,8 @@ class _EditScenePageState extends State<EditScenePage> {
       description: _descriptionController.text,
       mood: _moodController.text,
       topic: _topicController.text,
-      language: _languageController.text,  // Updated language
+      language: _languageController.text, 
+      userId: widget.scene.userId,  // Updated language
     );
 
     // Update the scene using the MockScenesRepository
