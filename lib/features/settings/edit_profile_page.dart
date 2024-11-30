@@ -19,6 +19,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isChangePasswordVisible = false;
+  String? _successMessage;
 
   @override
   void initState() {
@@ -63,6 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _successMessage = null;
     });
 
     try {
@@ -78,6 +81,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode != 200) {
         throw Exception('Failed to save profile');
+      } else {
+        setState(() {
+          _successMessage = 'Profile updated successfully!';
+        });
       }
     } catch (e) {
       setState(() {
@@ -105,6 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _successMessage = null;
     });
 
     try {
@@ -123,6 +131,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode != 200) {
         throw Exception('Failed to change password');
+      } else {
+        setState(() {
+          _successMessage = 'Password changed successfully!';
+          _isChangePasswordVisible = false; // Hide the change password UI
+        });
       }
     } catch (e) {
       setState(() {
@@ -141,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(title: const Text('Edit Profile')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
@@ -159,32 +172,51 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: const Text('Save Profile'),
                   ),
                   const Divider(height: 32),
-                  TextField(
-                    controller: _currentPasswordController,
-                    decoration: const InputDecoration(labelText: 'Current Password'),
-                    obscureText: true,
+                  SwitchListTile(
+                    title: const Text('Change Password'),
+                    value: _isChangePasswordVisible,
+                    onChanged: (value) {
+                      setState(() {
+                        _isChangePasswordVisible = value;
+                      });
+                    },
                   ),
-                  TextField(
-                    controller: _newPasswordController,
-                    decoration: const InputDecoration(labelText: 'New Password'),
-                    obscureText: true,
-                  ),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    decoration: const InputDecoration(labelText: 'Confirm New Password'),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _changePassword,
-                    child: const Text('Change Password'),
-                  ),
+                  if (_isChangePasswordVisible) ...[
+                    TextField(
+                      controller: _currentPasswordController,
+                      decoration: const InputDecoration(labelText: 'Current Password'),
+                      obscureText: true,
+                    ),
+                    TextField(
+                      controller: _newPasswordController,
+                      decoration: const InputDecoration(labelText: 'New Password'),
+                      obscureText: true,
+                    ),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      decoration: const InputDecoration(labelText: 'Confirm New Password'),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _changePassword,
+                      child: const Text('Change Password'),
+                    ),
+                  ],
                   if (_errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 16),
                       child: Text(
                         _errorMessage!,
                         style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  if (_successMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        _successMessage!,
+                        style: const TextStyle(color: Colors.green),
                       ),
                     ),
                 ],
