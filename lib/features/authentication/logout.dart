@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
 import '../../shared/utils/token_storage.dart';
 
 class LogoutPage extends StatelessWidget {

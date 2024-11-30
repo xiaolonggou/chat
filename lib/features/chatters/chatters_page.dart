@@ -7,7 +7,7 @@ import 'chatters_controller.dart';
 class ChattersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +71,7 @@ class ChattersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
 
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:chat/features/settings/edit_profile_page.dart';
 import 'package:chat/shared/utils/token_storage.dart'; // Import TokenStorage for logout
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure storage for token removal
+// Secure storage for token removal
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
