@@ -2,6 +2,7 @@ import 'package:chat/data/api_chatters_repository.dart';
 import 'package:chat/data/api_scenes_repository.dart';
 import 'package:chat/data/mock_chatters_repository.dart';
 import 'package:chat/data/mock_scenes_repository.dart';
+import 'package:chat/features/chats/chat_controller.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
 import 'package:chat/features/chatters/chatters_page.dart';
 import 'package:chat/features/chatters/chatters_repository.dart';
@@ -31,10 +32,12 @@ void main() async {
 
   final chattersController = ChattersController(repository: chattersRepository);
   final scenesController = ScenesController(repository: scenesRepository);
+  final chatController = ChatController();
 
   runApp(MyApp(
     chattersController: chattersController,
     scenesController: scenesController,
+    chatController: chatController,
     useMockData: useMockData,
   ));
 }
@@ -54,11 +57,13 @@ Future<bool> _shouldUseMockData(String serverUrl) async {
 class MyApp extends StatelessWidget {
   final ChattersController chattersController;
   final ScenesController scenesController;
+  final ChatController chatController;
   final bool useMockData;
 
   MyApp({
     required this.chattersController,
     required this.scenesController,
+    required this.chatController,
     required this.useMockData,
   });
 
@@ -68,6 +73,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => chattersController),
         ChangeNotifierProvider(create: (_) => scenesController),
+        ChangeNotifierProvider(create: (_) => chatController),
       ],
       child: MaterialApp(
         title: 'Chat App',

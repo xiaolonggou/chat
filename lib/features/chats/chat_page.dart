@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chat/features/chats/chat_model.dart';
+import 'package:chat/features/chats/message_model.dart';
 
 class ChatPage extends StatelessWidget {
   final String scene;

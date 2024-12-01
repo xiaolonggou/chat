@@ -1,5 +1,3 @@
-// lib/data/api_scenes_repository.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../features/scenes/scene_model.dart';
@@ -7,24 +5,34 @@ import '../features/scenes/scenes_repository.dart';
 import '../shared/utils/token_storage.dart';
 
 class ApiScenesRepository implements ScenesRepository {
+  // Private constructor
+  ApiScenesRepository._internal({required this.baseUrl});
+
+  // Singleton instance
+  static ApiScenesRepository? _instance;
+
+  // Factory constructor for creating/accessing the singleton instance
+  factory ApiScenesRepository({required String baseUrl}) {
+    _instance ??= ApiScenesRepository._internal(baseUrl: baseUrl);
+    return _instance!;
+  }
+
+  // Base URL for API calls
   final String baseUrl;
 
-  ApiScenesRepository({required this.baseUrl});
-
-  // Helper method to get the JWT token
+  // Private helper method to get the JWT token
   Future<String?> _getToken() async {
-    return await TokenStorage.retrieveToken(); // Read the token from secure storage
+    return await TokenStorage.retrieveToken(); // Retrieve the token from secure storage
   }
 
   @override
-  Future<List<Scene>> fetchScenes() async {
-    final token = await _getToken(); // Get the token
-
+   Future<List<Scene>> fetchScenes() async {
+    final token = await TokenStorage.retrieveToken(); // Get the token
     final response = await http.get(
       Uri.parse('$baseUrl/scenes'),
       headers: {
         'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token', // Add Authorization header
+        'Authorization': 'Bearer $token',
       },
     );
 
@@ -35,7 +43,7 @@ class ApiScenesRepository implements ScenesRepository {
       throw Exception('Failed to fetch scenes');
     }
   }
-
+  
   @override
   Future<void> saveScene(Scene scene) async {
     final token = await _getToken(); // Get the token

@@ -1,5 +1,3 @@
-// lib/data/api_chatters_repository.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../features/chatters/chatters_model.dart';
@@ -7,10 +5,22 @@ import '../features/chatters/chatters_repository.dart';
 import '../shared/utils/token_storage.dart'; // Import TokenStorage to retrieve JWT
 
 class ApiChattersRepository implements ChattersRepository {
+  // Private constructor
+  ApiChattersRepository._internal({required this.baseUrl});
+
+  // Singleton instance
+  static ApiChattersRepository? _instance;
+
+  // Factory constructor for creating/accessing the singleton instance
+  factory ApiChattersRepository({required String baseUrl}) {
+    _instance ??= ApiChattersRepository._internal(baseUrl: baseUrl);
+    return _instance!;
+  }
+
+  // Base URL for API calls
   final String baseUrl;
 
-  ApiChattersRepository({required this.baseUrl});
-
+  // Private method to get authentication headers
   Future<Map<String, String>> _getHeaders() async {
     final token = await TokenStorage.retrieveToken();
     if (token == null) {
