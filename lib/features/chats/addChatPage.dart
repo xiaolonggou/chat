@@ -3,7 +3,7 @@ import 'package:chat/features/scenes/scenes_controller.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
 import 'package:chat/features/scenes/scene_model.dart';
 import 'package:chat/features/chatters/chatters_model.dart';
-import 'package:chat/features/chats/local_chatter_model.dart'; // Import LocalChatter model
+import 'package:chat/features/chats/local_chatter_model.dart';
 
 class AddChatPage extends StatefulWidget {
   final ScenesController scenesController;
@@ -22,18 +22,19 @@ class AddChatPage extends StatefulWidget {
 class _AddChatPageState extends State<AddChatPage> {
   late Future<List<Scene>> _scenesFuture;
   late Future<List<Chatter>> _chattersFuture;
-  List<LocalChatter> selectedChatters = []; // List to hold selected LocalChatters
+  List<LocalChatter> selectedChatters = [];
   Scene? selectedScene;
+
+  final TextEditingController subjectController = TextEditingController();
+  final TextEditingController meetingReasonController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Initialize the Futures by calling the fetch methods from the controllers
-    _scenesFuture = widget.scenesController.repository.fetchScenes(); 
+    _scenesFuture = widget.scenesController.repository.fetchScenes();
     _chattersFuture = widget.chattersController.repository.fetchChatters();
   }
 
-  // Function to handle adding a new chatter to the list
   void _addLocalChatter(Chatter chatter) {
     final localChatter = LocalChatter(
       id: chatter.id,
@@ -41,25 +42,39 @@ class _AddChatPageState extends State<AddChatPage> {
       gender: chatter.gender,
       job: chatter.job,
       personality: chatter.personality,
-      objective: '', // Set dynamic properties like objective and mood
+      objective: '',
       mood: '',
     );
 
     setState(() {
-      selectedChatters.add(localChatter); // Add to the list of selected chatters
+      selectedChatters.add(localChatter);
     });
   }
 
-  // Function to handle updating a chatter's dynamic properties
   void _updateLocalChatter(LocalChatter chatter, String objective, String mood) {
     final updatedChatter = chatter.copyWith(objective: objective, mood: mood);
-    
+
     setState(() {
       int index = selectedChatters.indexOf(chatter);
       if (index != -1) {
-        selectedChatters[index] = updatedChatter; // Update the selected chatter
+        selectedChatters[index] = updatedChatter;
       }
     });
+  }
+
+  bool _isFormValid() {
+    return subjectController.text.isNotEmpty &&
+        meetingReasonController.text.isNotEmpty &&
+        selectedScene != null &&
+        selectedChatters.isNotEmpty;
+  }
+
+  void _createChat() {
+    if (_isFormValid()) {
+      print('Chat created with subject: ${subjectController.text} and reason: ${meetingReasonController.text}');
+    } else {
+      print('Please fill out all fields.');
+    }
   }
 
   @override
@@ -72,25 +87,24 @@ class _AddChatPageState extends State<AddChatPage> {
         future: _scenesFuture,
         builder: (context, scenesSnapshot) {
           if (scenesSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (scenesSnapshot.hasError) {
             return Center(child: Text('Error: ${scenesSnapshot.error}'));
           } else if (!scenesSnapshot.hasData || scenesSnapshot.data!.isEmpty) {
-            return Center(child: Text('No scenes available'));
+            return const Center(child: Text('No scenes available'));
           }
 
           return FutureBuilder<List<Chatter>>(
             future: _chattersFuture,
             builder: (context, chattersSnapshot) {
               if (chattersSnapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (chattersSnapshot.hasError) {
                 return Center(child: Text('Error: ${chattersSnapshot.error}'));
               } else if (!chattersSnapshot.hasData || chattersSnapshot.data!.isEmpty) {
-                return Center(child: Text('No chatters available'));
+                return const Center(child: Text('No chatters available'));
               }
 
-              // Once both Futures have data, build the UI for selecting a scene and chatter
               final scenes = scenesSnapshot.data!;
               final chatters = chattersSnapshot.data!;
 
@@ -98,14 +112,35 @@ class _AddChatPageState extends State<AddChatPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    DropdownButton<Scene>(
-                      hint: Text('Select Scene'),
-                      onChanged: (Scene? selected) {
+                    TextField(
+                      controller: subjectController,
+                      decoration: const InputDecoration(
+                        labelText: 'Subject',
+                        hintText: 'Enter the subject of the chat',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextField(
+                      controller: meetingReasonController,
+                      decoration: const InputDecoration(
+                        labelText: 'Reason for Meeting',
+                        hintText: 'Enter the reason for the meeting',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    DropdownButtonFormField<Scene>(
+                      decoration: const InputDecoration(
+                        labelText: 'Select Scene',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedScene,
+                      onChanged: (Scene? newValue) {
                         setState(() {
-                          selectedScene = selected;
+                          selectedScene = newValue;
                         });
                       },
-                      value: selectedScene,
                       items: scenes.map((scene) {
                         return DropdownMenuItem<Scene>(
                           value: scene,
@@ -113,11 +148,15 @@ class _AddChatPageState extends State<AddChatPage> {
                         );
                       }).toList(),
                     ),
-                    DropdownButton<Chatter>(
-                      hint: Text('Select Chatter'),
+                    const SizedBox(height: 16.0),
+                    DropdownButtonFormField<Chatter>(
+                      decoration: const InputDecoration(
+                        labelText: 'Select Chatter',
+                        border: OutlineInputBorder(),
+                      ),
                       onChanged: (Chatter? selectedChatter) {
                         if (selectedChatter != null) {
-                          _addLocalChatter(selectedChatter); // Add to selected chatters
+                          _addLocalChatter(selectedChatter);
                         }
                       },
                       items: chatters.map((chatter) {
@@ -127,7 +166,7 @@ class _AddChatPageState extends State<AddChatPage> {
                         );
                       }).toList(),
                     ),
-                    // Display selected chatters with options to modify their properties
+                    const SizedBox(height: 16.0),
                     Expanded(
                       child: ListView.builder(
                         itemCount: selectedChatters.length,
@@ -135,30 +174,20 @@ class _AddChatPageState extends State<AddChatPage> {
                           final localChatter = selectedChatters[index];
                           return ListTile(
                             title: Text(localChatter.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Objective: ${localChatter.objective ?? "Not set"}'),
-                                Text('Mood: ${localChatter.mood ?? "Not set"}'),
-                              ],
+                            subtitle: Text(
+                              'Objective: ${localChatter.objective!.isEmpty ? "Not set" : localChatter.objective}, Mood: ${localChatter.mood!.isEmpty ? "Not set" : localChatter.mood}',
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                // Open dialog to update objective and mood
-                                _showEditDialog(localChatter);
-                              },
+                              onPressed: () => _showEditDialog(localChatter),
                             ),
                           );
                         },
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        // Handle chat creation logic here
-                        // Pass the selected scene and localChatters to create a new chat
-                      },
-                      child: Text('Create Chat'),
+                      onPressed: _createChat,
+                      child: const Text('Create Chat'),
                     ),
                   ],
                 ),
@@ -169,11 +198,9 @@ class _AddChatPageState extends State<AddChatPage> {
       ),
     );
   }
-
-  // Show dialog to update objective and mood
-  void _showEditDialog(LocalChatter chatter) {
-    final TextEditingController objectiveController = TextEditingController(text: chatter.objective);
-    final TextEditingController moodController = TextEditingController(text: chatter.mood);
+   void _showEditDialog(LocalChatter chatter) {
+    final objectiveController = TextEditingController(text: chatter.objective);
+    final moodController = TextEditingController(text: chatter.mood);
 
     showDialog(
       context: context,
@@ -185,28 +212,25 @@ class _AddChatPageState extends State<AddChatPage> {
             children: [
               TextField(
                 controller: objectiveController,
-                decoration: InputDecoration(labelText: 'Objective'),
+                decoration: const InputDecoration(labelText: 'Objective'),
               ),
               TextField(
                 controller: moodController,
-                decoration: InputDecoration(labelText: 'Mood'),
+                decoration: const InputDecoration(labelText: 'Mood'),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () {
-                // Update the chatter's properties and close the dialog
                 _updateLocalChatter(chatter, objectiveController.text, moodController.text);
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
             ),
           ],
         );

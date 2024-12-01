@@ -4,12 +4,16 @@ import 'package:chat/features/scenes/scene_model.dart';
 
 
 class Chat {
+  final String subject;
+  final String meetingReason;
   final String id;
   final Scene scene;
   final List<LocalChatter> participants; // List of LocalChatter for local metadata
   final List<Message> messages;
 
   Chat({
+    required this.subject,
+    required this.meetingReason,
     required this.id,
     required this.scene, // Use Scene object for chat scene
     required this.participants, // List of LocalChatter objects
