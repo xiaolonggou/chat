@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _usernameController,
               decoration: InputDecoration(
                 labelText: 'Username',
-                errorText: _errorMessage != null ? _errorMessage : null,
+                errorText: _errorMessage,
               ),
             ),
             const SizedBox(height: 16),
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: 'Password',
-                errorText: _errorMessage != null ? _errorMessage : null,
+                errorText: _errorMessage,
               ),
               obscureText: true,
             ),
