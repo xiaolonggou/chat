@@ -7,7 +7,6 @@ class MockScenesRepository implements ScenesRepository {
   final List<Scene> _scenes = [
     Scene(
       id: 1,
-      userId: 1,
       name: 'Living Room Chat',
       description: 'A cozy conversation in the living room.',
       mood: 'Relaxed',
@@ -16,7 +15,6 @@ class MockScenesRepository implements ScenesRepository {
     ),
     Scene(
       id: 2,
-      userId: 2,
       name: 'Office Meeting',
       description: 'A discussion during a business meeting.',
       mood: 'Professional',
@@ -55,7 +53,7 @@ class MockScenesRepository implements ScenesRepository {
 
   Future<List<Scene>> getScenesByUserId(int userId) async {
     await Future.delayed(const Duration(milliseconds: 500)); // Simulate delay
-    return _scenes.where((scene) => scene.userId == userId).toList();
+    return _scenes;
   }
 
   void updateScene(Scene updatedScene) {

@@ -1,3 +1,4 @@
+import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/scenes/scenes_controller.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
@@ -69,11 +70,38 @@ class _AddChatPageState extends State<AddChatPage> {
         selectedChatters.isNotEmpty;
   }
 
-  void _createChat() {
+  Future<void> _createChat() async {
     if (_isFormValid()) {
-      print('Chat created with subject: ${subjectController.text} and reason: ${meetingReasonController.text}');
+      final db = await DBHelper().database;
+
+      // Insert into 'chats' table
+      final chatId = DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID for the chat
+      await db.insert('chats', {
+        'id': chatId,
+        'subject': subjectController.text,
+        'meetingReason': meetingReasonController.text,
+        'sceneId': selectedScene!.id,
+      });
+
+      // Insert participants into 'chat_participants' table
+      for (final participant in selectedChatters) {
+        await db.insert('chat_participants', {
+          'chatId': chatId,
+          'participantId': participant.id,
+          'objective': participant.objective,
+          'mood': participant.mood,
+        });
+      }
+
+      // Show a success message and navigate back
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chat created successfully')),
+      );
+      Navigator.of(context).pop();
     } else {
-      print('Please fill out all fields.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill out all fields.')),
+      );
     }
   }
 
@@ -198,7 +226,8 @@ class _AddChatPageState extends State<AddChatPage> {
       ),
     );
   }
-   void _showEditDialog(LocalChatter chatter) {
+
+  void _showEditDialog(LocalChatter chatter) {
     final objectiveController = TextEditingController(text: chatter.objective);
     final moodController = TextEditingController(text: chatter.mood);
 

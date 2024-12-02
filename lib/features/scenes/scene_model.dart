@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 
 class Scene extends Equatable {
   final int? id; // id is nullable, assigned by the backend after creation
-  final int userId; // userId is non-nullable
   final String? name; // name can be nullable
   final String? description; // description can be nullable
   final String? mood; // mood can be nullable
@@ -11,7 +10,6 @@ class Scene extends Equatable {
 
   const Scene({
     this.id, // id can be nullable, assigned by backend
-    required this.userId, // userId is required
     this.name, // name is optional
     this.description, // description is optional
     this.mood, // mood is optional
@@ -23,7 +21,6 @@ class Scene extends Equatable {
   factory Scene.fromJson(Map<String, dynamic> json) {
     return Scene(
       id: json['id'] as int?, // id can be nullable, assigned by the backend
-      userId: json['user_id'] as int, // userId is required
       name: json['name'] as String?, // name can be nullable
       description: json['description'] as String?, // description can be nullable
       mood: json['mood'] as String?, // mood can be nullable
@@ -36,7 +33,6 @@ class Scene extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'id': id, // id can be nullable
-      'user_id': userId, // userId is required
       'name': name, // name can be nullable
       'description': description, // description can be nullable
       'mood': mood, // mood can be nullable
@@ -57,7 +53,6 @@ class Scene extends Equatable {
   }) {
     return Scene(
       id: id ?? this.id, // id can be nullable, assigned by backend
-      userId: userId ?? this.userId, // userId is required
       name: name ?? this.name, // name can be nullable
       description: description ?? this.description, // description can be nullable
       mood: mood ?? this.mood, // mood can be nullable
@@ -67,5 +62,5 @@ class Scene extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, userId, name, description, mood, topic, language];
+  List<Object?> get props => [id, name, description, mood, topic, language];
 }

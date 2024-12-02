@@ -95,7 +95,6 @@ class _EditScenePageState extends State<EditScenePage> {
       mood: _moodController.text,
       topic: _topicController.text,
       language: _languageController.text, 
-      userId: widget.scene.userId,  // Keep the userId
     );
 
     // Use the ScenesController to update the scene via its repository
