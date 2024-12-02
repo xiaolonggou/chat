@@ -14,13 +14,10 @@ import 'package:chat/features/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'features/authentication/login_page.dart'; // Import LoginPage
 import 'shared/utils/token_storage.dart'; // Import TokenStorage for handling token
 
 void main() async {
- // Initialize the sqflite FFI database factory
-  databaseFactory = databaseFactoryFfi;
 
   WidgetsFlutterBinding.ensureInitialized();
   const String serverUrl = 'http://localhost:3000';
@@ -36,7 +33,7 @@ void main() async {
 
   final chattersController = ChattersController(repository: chattersRepository);
   final scenesController = ScenesController(repository: scenesRepository);
-  final chatController = ChatController();
+  final chatController = ChatController(scenesController:scenesController, chattersController: chattersController);
 
   runApp(MyApp(
     chattersController: chattersController,
