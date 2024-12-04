@@ -23,11 +23,12 @@ class AddChatPage extends StatefulWidget {
 class _AddChatPageState extends State<AddChatPage> {
   late Future<List<Scene>> _scenesFuture;
   late Future<List<Chatter>> _chattersFuture;
-  List<LocalChatter> selectedChatters = [];
-  Scene? selectedScene;
 
-  final TextEditingController subjectController = TextEditingController();
-  final TextEditingController meetingReasonController = TextEditingController();
+  final List<LocalChatter> _selectedChatters = [];
+  Scene? _selectedScene;
+
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _meetingReasonController = TextEditingController();
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _AddChatPageState extends State<AddChatPage> {
     _chattersFuture = widget.chattersController.repository.fetchChatters();
   }
 
-  void _addLocalChatter(Chatter chatter) {
+  void _addChatter(Chatter chatter) {
     final localChatter = LocalChatter(
       id: chatter.id,
       name: chatter.name,
@@ -48,179 +49,113 @@ class _AddChatPageState extends State<AddChatPage> {
     );
 
     setState(() {
-      selectedChatters.add(localChatter);
+      _selectedChatters.add(localChatter);
     });
   }
 
-  void _updateLocalChatter(LocalChatter chatter, String objective, String mood) {
+  void _editChatter(LocalChatter chatter, String objective, String mood) {
     final updatedChatter = chatter.copyWith(objective: objective, mood: mood);
 
     setState(() {
-      int index = selectedChatters.indexOf(chatter);
+      final index = _selectedChatters.indexOf(chatter);
       if (index != -1) {
-        selectedChatters[index] = updatedChatter;
+        _selectedChatters[index] = updatedChatter;
       }
     });
   }
 
   bool _isFormValid() {
-    return subjectController.text.isNotEmpty &&
-        meetingReasonController.text.isNotEmpty &&
-        selectedScene != null &&
-        selectedChatters.isNotEmpty;
+    return _subjectController.text.isNotEmpty &&
+        _meetingReasonController.text.isNotEmpty &&
+        _selectedScene != null &&
+        _selectedChatters.isNotEmpty;
   }
 
   Future<void> _createChat() async {
     if (_isFormValid()) {
       final db = await DBHelper().database;
 
-      // Insert into 'chats' table
-      final chatId = DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID for the chat
+      final chatId = DateTime.now().millisecondsSinceEpoch.toString();
+
       await db.insert('chats', {
         'id': chatId,
-        'subject': subjectController.text,
-        'meetingReason': meetingReasonController.text,
-        'sceneId': selectedScene!.id,
+        'subject': _subjectController.text,
+        'meetingReason': _meetingReasonController.text,
+        'sceneId': _selectedScene!.id,
       });
 
-      // Insert participants into 'chat_participants' table
-      for (final participant in selectedChatters) {
+      for (final chatter in _selectedChatters) {
         await db.insert('chat_participants', {
           'chatId': chatId,
-          'participantId': participant.id,
-          'objective': participant.objective,
-          'mood': participant.mood,
+          'participantId': chatter.id,
+          'objective': chatter.objective,
+          'mood': chatter.mood,
         });
       }
 
-      // Show a success message and navigate back
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chat created successfully')),
-      );
-      Navigator.of(context).pop();
+      _showSnackbar('Chat created successfully');
+      _refreshData();
+      Navigator.of(context).pop(true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill out all fields.')),
-      );
+      _showSnackbar('Please fill out all fields');
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Chat'),
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Widget _buildSceneDropdown(List<Scene> scenes) {
+    return DropdownButtonFormField<Scene>(
+      decoration: const InputDecoration(
+        labelText: 'Select Scene',
+        border: OutlineInputBorder(),
       ),
-      body: FutureBuilder<List<Scene>>(
-        future: _scenesFuture,
-        builder: (context, scenesSnapshot) {
-          if (scenesSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (scenesSnapshot.hasError) {
-            return Center(child: Text('Error: ${scenesSnapshot.error}'));
-          } else if (!scenesSnapshot.hasData || scenesSnapshot.data!.isEmpty) {
-            return const Center(child: Text('No scenes available'));
-          }
+      value: _selectedScene,
+      onChanged: (Scene? newScene) => setState(() => _selectedScene = newScene),
+      items: scenes.map((scene) {
+        return DropdownMenuItem<Scene>(
+          value: scene,
+          child: Text(scene.name ?? 'Unknown'),
+        );
+      }).toList(),
+    );
+  }
 
-          return FutureBuilder<List<Chatter>>(
-            future: _chattersFuture,
-            builder: (context, chattersSnapshot) {
-              if (chattersSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (chattersSnapshot.hasError) {
-                return Center(child: Text('Error: ${chattersSnapshot.error}'));
-              } else if (!chattersSnapshot.hasData || chattersSnapshot.data!.isEmpty) {
-                return const Center(child: Text('No chatters available'));
-              }
+  Widget _buildChatterDropdown(List<Chatter> chatters) {
+    return DropdownButtonFormField<Chatter>(
+      decoration: const InputDecoration(
+        labelText: 'Select Chatter',
+        border: OutlineInputBorder(),
+      ),
+      onChanged: (Chatter? chatter) {
+        if (chatter != null) _addChatter(chatter);
+      },
+      items: chatters.map((chatter) {
+        return DropdownMenuItem<Chatter>(
+          value: chatter,
+          child: Text(chatter.name),
+        );
+      }).toList(),
+    );
+  }
 
-              final scenes = scenesSnapshot.data!;
-              final chatters = chattersSnapshot.data!;
-
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: subjectController,
-                      decoration: const InputDecoration(
-                        labelText: 'Subject',
-                        hintText: 'Enter the subject of the chat',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextField(
-                      controller: meetingReasonController,
-                      decoration: const InputDecoration(
-                        labelText: 'Reason for Meeting',
-                        hintText: 'Enter the reason for the meeting',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    DropdownButtonFormField<Scene>(
-                      decoration: const InputDecoration(
-                        labelText: 'Select Scene',
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedScene,
-                      onChanged: (Scene? newValue) {
-                        setState(() {
-                          selectedScene = newValue;
-                        });
-                      },
-                      items: scenes.map((scene) {
-                        return DropdownMenuItem<Scene>(
-                          value: scene,
-                          child: Text(scene.name ?? 'Unknown'),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16.0),
-                    DropdownButtonFormField<Chatter>(
-                      decoration: const InputDecoration(
-                        labelText: 'Select Chatter',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (Chatter? selectedChatter) {
-                        if (selectedChatter != null) {
-                          _addLocalChatter(selectedChatter);
-                        }
-                      },
-                      items: chatters.map((chatter) {
-                        return DropdownMenuItem<Chatter>(
-                          value: chatter,
-                          child: Text(chatter.name),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: selectedChatters.length,
-                        itemBuilder: (context, index) {
-                          final localChatter = selectedChatters[index];
-                          return ListTile(
-                            title: Text(localChatter.name),
-                            subtitle: Text(
-                              'Objective: ${localChatter.objective!.isEmpty ? "Not set" : localChatter.objective}, Mood: ${localChatter.mood!.isEmpty ? "Not set" : localChatter.mood}',
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () => _showEditDialog(localChatter),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _createChat,
-                      child: const Text('Create Chat'),
-                    ),
-                  ],
-                ),
-              );
-            },
+  Widget _buildSelectedChattersList() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _selectedChatters.length,
+        itemBuilder: (context, index) {
+          final chatter = _selectedChatters[index];
+          return ListTile(
+            title: Text(chatter.name),
+            subtitle: Text(
+              'Objective: ${chatter.objective!.isEmpty ? "Not set" : chatter.objective}, '
+              'Mood: ${chatter.mood!.isEmpty ? "Not set" : chatter.mood}',
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _showEditDialog(chatter),
+            ),
           );
         },
       ),
@@ -252,7 +187,7 @@ class _AddChatPageState extends State<AddChatPage> {
           actions: [
             TextButton(
               onPressed: () {
-                _updateLocalChatter(chatter, objectiveController.text, moodController.text);
+                _editChatter(chatter, objectiveController.text, moodController.text);
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),
@@ -266,4 +201,80 @@ class _AddChatPageState extends State<AddChatPage> {
       },
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Add Chat')),
+      body: FutureBuilder<List<Scene>>(
+        future: _scenesFuture,
+        builder: (context, sceneSnapshot) {
+          if (sceneSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (sceneSnapshot.hasError || !sceneSnapshot.hasData || sceneSnapshot.data!.isEmpty) {
+            return const Center(child: Text('No scenes available.'));
+          }
+
+          return FutureBuilder<List<Chatter>>(
+            future: _chattersFuture,
+            builder: (context, chatterSnapshot) {
+              if (chatterSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (chatterSnapshot.hasError || !chatterSnapshot.hasData || chatterSnapshot.data!.isEmpty) {
+                return const Center(child: Text('No chatters available.'));
+              }
+
+              final scenes = sceneSnapshot.data!;
+              final chatters = chatterSnapshot.data!;
+
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _subjectController,
+                      decoration: const InputDecoration(
+                        labelText: 'Subject',
+                        hintText: 'Enter chat subject',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _meetingReasonController,
+                      decoration: const InputDecoration(
+                        labelText: 'Reason for Meeting',
+                        hintText: 'Enter reason for meeting',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSceneDropdown(scenes),
+                    const SizedBox(height: 16),
+                    _buildChatterDropdown(chatters),
+                    const SizedBox(height: 16),
+                    _buildSelectedChattersList(),
+                    ElevatedButton(
+                      onPressed: _createChat,
+                      child: const Text('Create Chat'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+  
+  void _refreshData() {  setState(() {
+    // Re-fetch the scenes and chatters from the database
+    _scenesFuture = widget.scenesController.repository.fetchScenes();
+    _chattersFuture = widget.chattersController.repository.fetchChatters();
+    _subjectController.clear();
+    _meetingReasonController.clear();
+    _selectedChatters.clear();
+    _selectedScene = null;
+  });}
 }

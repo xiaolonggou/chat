@@ -16,7 +16,6 @@ class _ChatsPageState extends State<ChatsPage> {
   @override
   void initState() {
     super.initState();
-    // Load chats when the page is first initialized
     _loadChats();
   }
 
@@ -25,11 +24,10 @@ class _ChatsPageState extends State<ChatsPage> {
     try {
       await chatController.loadChats(); // Load chats from the database
     } catch (e) {
-      // Handle error here
       print('Error loading chats: $e');
     }
     setState(() {
-      _isLoading = false; // Set loading to false once loading is complete
+      _isLoading = false;
     });
   }
 
@@ -79,9 +77,9 @@ class _ChatsPageState extends State<ChatsPage> {
                   },
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to AddChatPage
-          Navigator.push(
+        onPressed: () async {
+          // Navigate to AddChatPage and wait for a result
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AddChatPage(
@@ -90,6 +88,11 @@ class _ChatsPageState extends State<ChatsPage> {
               ),
             ),
           );
+
+          // Reload chats if a new chat was added
+          if (result == true) {
+            _loadChats();
+          }
         },
         child: const Icon(Icons.add),
       ),
