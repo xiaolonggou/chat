@@ -28,6 +28,7 @@ class ChatPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isMe = message.sender == 'You';
+
                 return Align(
                   alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
@@ -37,19 +38,28 @@ class ChatPage extends StatelessWidget {
                       color: isMe
                           ? Theme.of(context).colorScheme.primaryContainer
                           : Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment:
                           isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          message.sender,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                        // Timestamp
+                        Row(
+                          mainAxisAlignment:
+                              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              message.timestamp as String, // Assuming message has a timestamp field
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 1),
+                        // Message content
                         Text(
                           message.content,
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -62,36 +72,49 @@ class ChatPage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 56), // Added padding for better space
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30), // Adjust vertical padding
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end, // Ensure alignment to the bottom
               children: [
+                const SizedBox(width: 10), // Space between avatar and input box
+                // Input text field with flexible height and multiline support
                 Expanded(
                   child: TextField(
-                    maxLines: null,  // Allow text to grow vertically with multiple lines
+                    minLines: 1,
+                    maxLines: 5, // Limit to 5 lines, adjust as needed
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: 'Type a message...',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.primaryContainer,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                     ),
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline, // Allows multiline input with the return key
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  onPressed: () {
-                    // Handle message sending
-                  },
+                const SizedBox(width: 10), // Space between input and button
+                // Send button aligned to bottom
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      onPressed: () {
+                        // Handle message sending
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
+
           ),
         ],
       ),
