@@ -100,4 +100,35 @@ class ChatController with ChangeNotifier {
     // Notify listeners when the chats are updated
     notifyListeners();
   }
+
+Future<void> deleteChat(String chatId) async {
+  final db = await DBHelper().database;
+
+  // Delete all messages related to the chat
+  await db.delete(
+    'messages', // Adjust table name if it's different in your database
+    where: 'chatId = ?',
+    whereArgs: [chatId],
+  );
+
+  // Delete participants associated with the chat
+  await db.delete(
+    'chat_participants',
+    where: 'chatId = ?',
+    whereArgs: [chatId],
+  );
+
+  // Delete the chat itself
+  await db.delete(
+    'chats',
+    where: 'id = ?',
+    whereArgs: [chatId],
+  );
+
+  // Remove the chat from the local list
+  chats.removeWhere((chat) => chat.id == chatId);
+
+  notifyListeners(); // Notify listeners to refresh the UI
+}
+
 }

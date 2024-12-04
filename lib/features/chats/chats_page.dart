@@ -31,6 +31,19 @@ class _ChatsPageState extends State<ChatsPage> {
     });
   }
 
+  Future<void> _deleteChat(String chatId) async {
+    final chatController = Provider.of<ChatController>(context, listen: false);
+    try {
+      await chatController.deleteChat(chatId); // Call the delete function
+      await _loadChats(); // Reload chats after deletion
+    } catch (e) {
+      print('Error deleting chat: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete chat: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatController = Provider.of<ChatController>(context);
@@ -50,27 +63,43 @@ class _ChatsPageState extends State<ChatsPage> {
                   itemBuilder: (context, index) {
                     final chat = chatController.chats[index];
 
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      child: ListTile(
-                        title: Text(chat.subject),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Reason: ${chat.meetingReason}'),
-                            const SizedBox(height: 4.0),
-                            Text('Scene: ${chat.scene.name}'),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              'Participants: ${chat.participants.map((p) => p.name).join(', ')}',
-                            ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            // Navigate to edit page (implement your own edit page if needed)
-                          },
+                    return Dismissible(
+                      key: Key(chat.id), // Use a unique key for each item
+                      direction: DismissDirection.endToStart, // Swipe left to delete
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (direction) {
+                        _deleteChat(chat.id); // Call delete chat function
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${chat.subject} deleted')),
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        child: ListTile(
+                          title: Text(chat.subject),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Reason: ${chat.meetingReason}'),
+                              const SizedBox(height: 4.0),
+                              Text('Scene: ${chat.scene.name}'),
+                              const SizedBox(height: 4.0),
+                              Text(
+                                'Participants: ${chat.participants.map((p) => p.name).join(', ')}',
+                              ),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              // Navigate to edit page (implement your own edit page if needed)
+                            },
+                          ),
                         ),
                       ),
                     );
@@ -78,7 +107,6 @@ class _ChatsPageState extends State<ChatsPage> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Navigate to AddChatPage and wait for a result
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -89,7 +117,6 @@ class _ChatsPageState extends State<ChatsPage> {
             ),
           );
 
-          // Reload chats if a new chat was added
           if (result == true) {
             _loadChats();
           }

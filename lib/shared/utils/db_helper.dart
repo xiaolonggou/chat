@@ -47,36 +47,48 @@ Future<Database> _initDatabase() async {
 }
 
 
-  Future<void> _onCreate(Database db, int version) async {
-    try {
-      // Create `chats` table
-      await db.execute('''
-        CREATE TABLE chats (
-          id TEXT PRIMARY KEY,
-          subject TEXT NOT NULL,
-          meetingReason TEXT NOT NULL,
-          sceneId INTEGER NOT NULL
-        )
-      ''');
+Future<void> _onCreate(Database db, int version) async {
+  try {
+    // Create `chats` table
+    await db.execute('''
+      CREATE TABLE chats (
+        id TEXT PRIMARY KEY,
+        subject TEXT NOT NULL,
+        meetingReason TEXT NOT NULL,
+        sceneId INTEGER NOT NULL
+      )
+    ''');
 
-      // Create `chat_participants` table with a foreign key reference to `chats`
-      await db.execute('''
-        CREATE TABLE chat_participants (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          chatId TEXT NOT NULL,
-          participantId INTEGER NOT NULL,
-          objective TEXT,
-          mood TEXT,
-          FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE
-        )
-      ''');
+    // Create `chat_participants` table with a foreign key reference to `chats`
+    await db.execute('''
+      CREATE TABLE chat_participants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        chatId TEXT NOT NULL,
+        participantId INTEGER NOT NULL,
+        objective TEXT,
+        mood TEXT,
+        FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE
+      )
+    ''');
 
-      print('Database created successfully.'); // Debugging purpose
-    } catch (e) {
-      print('Error during database creation: $e');
-      rethrow;
-    }
+    // Create `messages` table with a foreign key reference to `chats`
+    await db.execute('''
+      CREATE TABLE messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        chatId TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE
+      )
+    ''');
+
+    print('Database created successfully.'); // Debugging purpose
+  } catch (e) {
+    print('Error during database creation: $e');
+    rethrow;
   }
+}
+
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     try {
@@ -97,6 +109,7 @@ Future<Database> _initDatabase() async {
       await db.transaction((txn) async {
         await txn.delete('chat_participants');
         await txn.delete('chats');
+        await txn.delete('messages');
       });
       print('Database reset successfully.');
     } catch (e) {
