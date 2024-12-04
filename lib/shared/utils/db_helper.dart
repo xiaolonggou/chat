@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat/features/chats/message_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -147,4 +148,33 @@ Future<void> _onCreate(Database db, int version) async {
     rethrow; // Re-throw the error for further handling if necessary
   }
 }
+
+  Future<List<Message>> fetchMessages(String chatId) async {
+  try {
+    final db = await database;
+
+    // Query messages for the given chatId
+    final maps = await db.query(
+      'messages',
+      where: 'chatId = ?',
+      whereArgs: [chatId],
+      orderBy: 'timestamp DESC', // Order by timestamp descending
+    );
+
+    // Convert the map results to Message objects
+    return List.generate(
+      maps.length,
+      (i) => Message(
+        id: maps[i]['id'].toString(),
+        sender: 'You', // Adjust this as needed
+        content: maps[i]['content'].toString(),
+        timestamp:DateTime.parse(maps[i]['timestamp'].toString()),
+      ),
+    );
+  } catch (e) {
+    print('Error fetching messages: $e');
+    rethrow;
+  }
+}
+
 }

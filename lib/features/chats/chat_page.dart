@@ -2,37 +2,85 @@ import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String scene;
   final String chatId;
   final List<String> participants;
-  final List<Message> messages;
-  final TextEditingController _messageController = TextEditingController();
 
-
-  ChatPage({
+  const ChatPage({
     super.key,
     required this.chatId,
     required this.scene,
     required this.participants,
-    required this.messages,
   });
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  final TextEditingController _messageController = TextEditingController();
+  List<Message> messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages(); // Load messages when the page initializes
+  }
+
+  Future<void> _loadMessages() async {
+    try {
+      final dbMessages = await DBHelper().fetchMessages(widget.chatId);
+      setState(() {
+        messages = dbMessages;
+      });
+    } catch (e) {
+      print('Error loading messages: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load messages.')),
+      );
+    }
+  }
+
+  void _sendMessage() async {
+    final messageText = _messageController.text.trim();
+
+    if (messageText.isEmpty) return;
+
+    final timestamp = DateTime.now();
+
+    try {
+      // Insert the message into the database
+      await DBHelper().insertMessage(widget.chatId, messageText, timestamp);
+
+      // Clear the input field
+      _messageController.clear();
+
+      // Reload messages from the database
+      _loadMessages();
+    } catch (e) {
+      print('Error sending message: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send message.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat: $scene'),
+        title: Text('Chat: ${widget.scene}'),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
               itemCount: messages.length,
-              reverse: true, // Newest message at the bottom
+              reverse: false, // Messages should be loaded in correct order
               itemBuilder: (context, index) {
                 final message = messages[index];
-                final isMe = message.sender == 'You';
+                final isMe = message.sender == 'You'; // Adjust based on sender field
 
                 return Align(
                   alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -55,7 +103,7 @@ class ChatPage extends StatelessWidget {
                               isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                           children: [
                             Text(
-                              message.timestamp as String, // Assuming message has a timestamp field
+                              message.timestamp.toString(), // Display timestamp
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     fontSize: 10,
                                     color: Colors.grey,
@@ -77,17 +125,15 @@ class ChatPage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30), // Adjust vertical padding
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15), // Adjust vertical padding
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end, // Ensure alignment to the bottom
               children: [
-                const SizedBox(width: 10), // Space between avatar and input box
-                // Input text field with flexible height and multiline support
                 Expanded(
                   child: TextField(
-                    controller: _messageController, // Attach the controller
+                    controller: _messageController,
                     minLines: 1,
-                    maxLines: 5, // Limit to 5 lines, adjust as needed
+                    maxLines: 5,
                     decoration: InputDecoration(
                       hintText: 'Type a message...',
                       border: OutlineInputBorder(
@@ -99,61 +145,22 @@ class ChatPage extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                     ),
                     keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline, // Allows multiline input with the return key
+                    textInputAction: TextInputAction.newline,
                   ),
                 ),
-                const SizedBox(width: 10), // Space between input and button
-                // Send button aligned to bottom
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      onPressed: () {
-                        // Handle message sending
-                        _sendMessage();
-                      },
-                    ),
-                  ],
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(
+                    Icons.send,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
-
           ),
         ],
       ),
     );
   }
-
-  void _sendMessage() async {
-    final messageText = _messageController.text.trim();
-
-    if (messageText.isEmpty) return;
-
-    final timestamp = DateTime.now();
-
-    try {
-      // Insert the message into the database
-      await DBHelper().insertMessage(chatId, messageText, timestamp);
-
-      // Clear the input field
-      _messageController.clear();
-
-      // Optionally update the local messages list (for immediate UI feedback)
-      final newMessage = Message(
-        id: UniqueKey().toString(), // Generate a unique ID (can also come from the DB)
-        sender: 'Me',
-        content: messageText,
-        timestamp: timestamp,
-      );
-
-      messages.insert(0, newMessage);
-    } catch (e) {
-      print('Error sending message: $e');
-    }
-  }
-
 }
