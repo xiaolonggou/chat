@@ -1,13 +1,18 @@
+import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
 
 class ChatPage extends StatelessWidget {
   final String scene;
+  final String chatId;
   final List<String> participants;
   final List<Message> messages;
+  final TextEditingController _messageController = TextEditingController();
+
 
   ChatPage({
     super.key,
+    required this.chatId,
     required this.scene,
     required this.participants,
     required this.messages,
@@ -80,6 +85,7 @@ class ChatPage extends StatelessWidget {
                 // Input text field with flexible height and multiline support
                 Expanded(
                   child: TextField(
+                    controller: _messageController, // Attach the controller
                     minLines: 1,
                     maxLines: 5, // Limit to 5 lines, adjust as needed
                     decoration: InputDecoration(
@@ -108,6 +114,7 @@ class ChatPage extends StatelessWidget {
                       ),
                       onPressed: () {
                         // Handle message sending
+                        _sendMessage();
                       },
                     ),
                   ],
@@ -120,4 +127,33 @@ class ChatPage extends StatelessWidget {
       ),
     );
   }
+
+  void _sendMessage() async {
+    final messageText = _messageController.text.trim();
+
+    if (messageText.isEmpty) return;
+
+    final timestamp = DateTime.now();
+
+    try {
+      // Insert the message into the database
+      await DBHelper().insertMessage(chatId, messageText, timestamp);
+
+      // Clear the input field
+      _messageController.clear();
+
+      // Optionally update the local messages list (for immediate UI feedback)
+      final newMessage = Message(
+        id: UniqueKey().toString(), // Generate a unique ID (can also come from the DB)
+        sender: 'Me',
+        content: messageText,
+        timestamp: timestamp,
+      );
+
+      messages.insert(0, newMessage);
+    } catch (e) {
+      print('Error sending message: $e');
+    }
+  }
+
 }

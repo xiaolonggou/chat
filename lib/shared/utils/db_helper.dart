@@ -125,4 +125,26 @@ Future<void> _onCreate(Database db, int version) async {
       _database = null;
     }
   }
+
+  Future<void> insertMessage(String chatId, String content, DateTime timestamp) async {
+  try {
+    final db = await database; // Get the database instance
+
+    // Insert the message into the `messages` table
+    await db.insert(
+      'messages',
+      {
+        'chatId': chatId,
+        'content': content,
+        'timestamp': timestamp.toIso8601String(), // Convert timestamp to ISO format
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    print('Message inserted successfully for chatId: $chatId');
+  } catch (e) {
+    print('Error inserting message: $e');
+    rethrow; // Re-throw the error for further handling if necessary
+  }
+}
 }
