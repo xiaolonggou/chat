@@ -1,3 +1,4 @@
+import 'package:chat/features/chats/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chat/features/chats/chat_controller.dart';
@@ -100,6 +101,19 @@ class _ChatsPageState extends State<ChatsPage> {
                               // Navigate to edit page (implement your own edit page if needed)
                             },
                           ),
+                          onTap: () {
+                          // Navigate to ChatPage with chat details
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatPage(
+                                scene: chat.scene.name ?? 'Unnamed Scene',
+                                participants: chat.participants.map((p) => p.name).toList(),
+                                messages: chat.messages,
+                              ),
+                            ),
+                          );
+                        },
                         ),
                       ),
                     );

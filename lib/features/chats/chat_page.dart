@@ -61,22 +61,24 @@ class ChatPage extends StatelessWidget {
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            color: Theme.of(context).colorScheme.surface,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 56), // Added padding for better space
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
+                    maxLines: null,  // Allow text to grow vertically with multiple lines
                     decoration: InputDecoration(
                       hintText: 'Type your message...',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.primaryContainer,
                     ),
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline, // Allows multiline input with the return key
                   ),
                 ),
                 IconButton(
