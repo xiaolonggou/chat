@@ -78,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(
             child: ListView.builder(
               itemCount: messages.length,
-              reverse: false, // Messages should be loaded in correct order
+              reverse: true, // Messages should be loaded in correct order
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isMe = message.sender == 'You'; // Adjust based on sender field
@@ -87,36 +87,44 @@ class _ChatPageState extends State<ChatPage> {
                   alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isMe
-                          ? Theme.of(context).colorScheme.primaryContainer
-                          : Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment:
-                          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // Shrinks to fit content
                       children: [
-                        // Timestamp
-                        Row(
-                          mainAxisAlignment:
-                              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              DateFormat('yyyy-MM-dd HH:mm').format(message.timestamp),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                  ),
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isMe
+                                  ? Theme.of(context).colorScheme.primaryContainer
+                                  : Theme.of(context).colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 1),
-                        // Message content
-                        Text(
-                          message.content,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                            child: Column(
+                              crossAxisAlignment: isMe
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                // Timestamp
+                                Text(
+                                  DateFormat('yyyy-MM-dd HH:mm')
+                                      .format(message.timestamp),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontSize: 10,
+                                        color: Colors.grey,
+                                      ),
+                                ),
+                                const SizedBox(height: 1),
+                                // Message content
+                                Text(
+                                  message.content,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
