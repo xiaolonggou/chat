@@ -75,13 +75,15 @@ Future<void> _onCreate(Database db, int version) async {
     // Create `messages` table with a foreign key reference to `chats`
     await db.execute('''
       CREATE TABLE messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chatId TEXT NOT NULL,
-        content TEXT NOT NULL,
-        timestamp TEXT NOT NULL,
-        FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE
+        id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Unique identifier for each message
+        chatId TEXT NOT NULL,                  -- Reference to the associated chat
+        sender TEXT NOT NULL,                  -- Who sent the message
+        content TEXT NOT NULL,                 -- The message content
+        timestamp TEXT NOT NULL,               -- Timestamp of when the message was sent
+        FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE -- Maintain referential integrity
       )
     ''');
+
 
     print('Database created successfully.'); // Debugging purpose
   } catch (e) {
@@ -127,7 +129,7 @@ Future<void> _onCreate(Database db, int version) async {
     }
   }
 
-  Future<void> insertMessage(String chatId, String content, DateTime timestamp) async {
+Future<void> insertMessage(String sender, String chatId, String content, DateTime timestamp) async {
   try {
     final db = await database; // Get the database instance
 
@@ -135,6 +137,7 @@ Future<void> _onCreate(Database db, int version) async {
     await db.insert(
       'messages',
       {
+        'sender': sender,
         'chatId': chatId,
         'content': content,
         'timestamp': timestamp.toIso8601String(), // Convert timestamp to ISO format
@@ -143,6 +146,24 @@ Future<void> _onCreate(Database db, int version) async {
     );
 
     print('Message inserted successfully for chatId: $chatId');
+  } catch (e) {
+    print('Error inserting message: $e');
+    rethrow; // Re-throw the error for further handling if necessary
+  }
+}
+
+Future<void> insertMessageWithMessage(Message message) async {
+  try {
+    final db = await database; // Get the database instance
+
+    // Insert the message into the `messages` table
+    await db.insert(
+      'messages',
+      message.toMap(), // Use the toMap() method from the Message class to get the message data
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    print('Message inserted successfully for chatId: ${message.chatId}');
   } catch (e) {
     print('Error inserting message: $e');
     rethrow; // Re-throw the error for further handling if necessary
@@ -168,7 +189,8 @@ Future<void> _onCreate(Database db, int version) async {
         id: maps[i]['id'].toString(),
         sender: 'You', // Adjust this as needed
         content: maps[i]['content'].toString(),
-        timestamp:DateTime.parse(maps[i]['timestamp'].toString()),
+        timestamp:DateTime.parse(maps[i]['timestamp'].toString()), 
+        chatId: maps[i]['chatId'].toString(),
       ),
     );
   } catch (e) {

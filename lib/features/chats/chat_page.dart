@@ -52,7 +52,7 @@ class _ChatPageState extends State<ChatPage> {
     final timestamp = DateTime.now();
 
     try {
-      await DBHelper().insertMessage(widget.chatId, messageText, timestamp);
+      await DBHelper().insertMessage('You', widget.chatId, messageText, timestamp);
 
       _messageController.clear();
       _loadMessages();
