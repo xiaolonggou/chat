@@ -1,7 +1,8 @@
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
-import 'package:intl/intl.dart';
+import 'package:chat/features/chats/widgets/message_bubble.dart';
+import 'package:chat/features/chats/widgets/chat_input_field.dart';
 
 class ChatPage extends StatefulWidget {
   final String scene;
@@ -43,7 +44,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _sendMessage() async {
+  Future<void> _sendMessage() async {
     final messageText = _messageController.text.trim();
 
     if (messageText.isEmpty) return;
@@ -51,13 +52,9 @@ class _ChatPageState extends State<ChatPage> {
     final timestamp = DateTime.now();
 
     try {
-      // Insert the message into the database
       await DBHelper().insertMessage(widget.chatId, messageText, timestamp);
 
-      // Clear the input field
       _messageController.clear();
-
-      // Reload messages from the database
       _loadMessages();
     } catch (e) {
       print('Error sending message: $e');
@@ -75,98 +72,26 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Column(
         children: [
+          // Message list
           Expanded(
             child: ListView.builder(
               itemCount: messages.length,
-              reverse: true, // Messages should be loaded in correct order
+              reverse: true, // Messages loaded in the correct order
               itemBuilder: (context, index) {
                 final message = messages[index];
-                final isMe = message.sender == 'You'; // Adjust based on sender field
+                final isMe = message.sender == 'You'; // Adjust based on sender
 
-                return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min, // Shrinks to fit content
-                      children: [
-                        Flexible(
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isMe
-                                  ? Theme.of(context).colorScheme.primaryContainer
-                                  : Theme.of(context).colorScheme.secondaryContainer,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isMe
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                // Timestamp
-                                Text(
-                                  DateFormat('yyyy-MM-dd HH:mm')
-                                      .format(message.timestamp),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        fontSize: 10,
-                                        color: Colors.grey,
-                                      ),
-                                ),
-                                const SizedBox(height: 1),
-                                // Message content
-                                Text(
-                                  message.content,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return MessageBubble(
+                  message: message,
+                  isMe: isMe,
                 );
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 35), // Adjust vertical padding
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end, // Ensure alignment to the bottom
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    minLines: 1,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context).colorScheme.primaryContainer,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                    ),
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
+          // Input field
+          ChatInputField(
+            controller: _messageController,
+            onSend: _sendMessage,
           ),
         ],
       ),
