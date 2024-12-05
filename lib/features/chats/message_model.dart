@@ -1,7 +1,6 @@
 // lib/features/chats/message_model.dart
 
 import 'dart:convert'; // For JSON encoding and decoding
-import 'package:flutter/foundation.dart';
 
 class Message {
   final String id; // Unique ID for the message

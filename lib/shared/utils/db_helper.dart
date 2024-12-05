@@ -187,7 +187,7 @@ Future<void> insertMessageWithMessage(Message message) async {
       maps.length,
       (i) => Message(
         id: maps[i]['id'].toString(),
-        sender: 'You', // Adjust this as needed
+        sender: maps[i]['sender'].toString(), // Adjust this as needed
         content: maps[i]['content'].toString(),
         timestamp:DateTime.parse(maps[i]['timestamp'].toString()), 
         chatId: maps[i]['chatId'].toString(),
