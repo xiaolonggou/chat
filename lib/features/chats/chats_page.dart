@@ -110,6 +110,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                 chatId:chat.id,
                                 scene: chat.scene.name ?? 'Unnamed Scene',
                                 participants: chat.participants.map((p) => p.name).toList(),
+                                chatController: chatController,
                               ),
                             ),
                           );

@@ -1,20 +1,22 @@
-import 'package:chat/features/chats/chat_controller.dart';
-import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:chat/shared/utils/db_helper.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/features/chats/widgets/message_bubble.dart';
 import 'package:chat/features/chats/widgets/chat_input_field.dart';
+import 'package:chat/features/chats/chat_controller.dart'; // Ensure this import is correct
 
 class ChatPage extends StatefulWidget {
   final String scene;
   final String chatId;
   final List<String> participants;
+  final ChatController chatController; // Pass chatController here
 
   const ChatPage({
     super.key,
     required this.chatId,
     required this.scene,
     required this.participants,
+    required this.chatController, // Ensure it's passed here
   });
 
   @override
@@ -24,14 +26,14 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   List<Message> messages = [];
-  // Instance of ChatController to manage sending messages
-  late final ChatController chatController;
+
   @override
   void initState() {
     super.initState();
     _loadMessages(); // Load messages when the page initializes
   }
 
+  // Load messages from the database
   Future<void> _loadMessages() async {
     try {
       final dbMessages = await DBHelper().fetchMessages(widget.chatId);
@@ -46,6 +48,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  // Send the message to the database and call chatController
   Future<void> _sendMessage() async {
     final messageText = _messageController.text.trim();
 
@@ -54,10 +57,14 @@ class _ChatPageState extends State<ChatPage> {
     final timestamp = DateTime.now();
 
     try {
+      // Insert the message into the local database
       await DBHelper().insertMessage('You', widget.chatId, messageText, timestamp);
-      //await chatController.sendMessage('hi backend.');
+      
+      // Call sendMessage method from chatController
+      await widget.chatController.sendMessage(messageText);
+      
       _messageController.clear();
-      _loadMessages();
+      _loadMessages(); // Reload messages after sending a new one
     } catch (e) {
       print('Error sending message: $e');
       ScaffoldMessenger.of(context).showSnackBar(
