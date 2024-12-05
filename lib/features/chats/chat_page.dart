@@ -1,3 +1,4 @@
+import 'package:chat/features/chats/chat_controller.dart';
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
@@ -23,7 +24,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   List<Message> messages = [];
-
+  // Instance of ChatController to manage sending messages
+  late final ChatController chatController;
   @override
   void initState() {
     super.initState();
@@ -53,7 +55,7 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       await DBHelper().insertMessage('You', widget.chatId, messageText, timestamp);
-
+      //await chatController.sendMessage('hi backend.');
       _messageController.clear();
       _loadMessages();
     } catch (e) {

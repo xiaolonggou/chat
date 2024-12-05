@@ -1,3 +1,4 @@
+import 'package:chat/features/chats/services/chat_service.dart';
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:chat/features/chats/chat_model.dart';
@@ -9,14 +10,26 @@ import 'package:chat/features/chatters/chatters_controller.dart';
 class ChatController with ChangeNotifier {
   final ScenesController scenesController;
   final ChattersController chattersController;
+  final ChatService chatService;
   List<Chat> chats = [];
 
   // Constructor now also requires the ChattersController
   ChatController({
     required this.scenesController,
     required this.chattersController,
+    required this.chatService,
   });
-
+  
+  Future<void> sendMessage(String message) async {
+    final reply = await chatService.sendMessage(message);
+    if (reply != null) {
+      // Handle the response from the server (e.g., update UI)
+      print('Received reply: $reply');
+    } else {
+      // Handle error case if reply is null
+      print('Failed to send message');
+    }
+  }
   // Load chats from the database and fetch scenes and chatters via API
   Future<void> loadChats() async {
     final db = await DBHelper().database;

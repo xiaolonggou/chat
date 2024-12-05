@@ -35,6 +35,7 @@ Future<Database> _initDatabase() async {
     return await openDatabase(
       path,
       version: 1,
+      readOnly: false,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
