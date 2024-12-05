@@ -1,6 +1,7 @@
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   final String scene;
@@ -103,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                               isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                           children: [
                             Text(
-                              message.timestamp.toString(), // Display timestamp
+                              DateFormat('yyyy-MM-dd HH:mm').format(message.timestamp),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     fontSize: 10,
                                     color: Colors.grey,
@@ -125,7 +126,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15), // Adjust vertical padding
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 35), // Adjust vertical padding
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end, // Ensure alignment to the bottom
               children: [
