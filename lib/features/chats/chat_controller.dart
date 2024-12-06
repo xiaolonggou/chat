@@ -20,16 +20,15 @@ class ChatController with ChangeNotifier {
     required this.chatService,
   });
   
-  Future<void> sendMessage(String message) async {
-    final reply = await chatService.sendMessage(message);
-    if (reply != null) {
-      // Handle the response from the server (e.g., update UI)
-      print('Received reply: $reply');
-    } else {
-      // Handle error case if reply is null
-      print('Failed to send message');
-    }
+  Future<void> sendMessage(Chat chat) async {
+  final reply = await chatService.sendMessage(chat);
+  if (reply != null) {
+    print('Received reply: $reply');
+  } else {
+    print('Failed to send message');
   }
+}
+
   // Load chats from the database and fetch scenes and chatters via API
   Future<void> loadChats() async {
     final db = await DBHelper().database;

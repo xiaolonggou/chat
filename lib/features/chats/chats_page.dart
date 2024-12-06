@@ -107,9 +107,7 @@ class _ChatsPageState extends State<ChatsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatPage(
-                                chatId:chat.id,
-                                scene: chat.scene.name ?? 'Unnamed Scene',
-                                participants: chat.participants.map((p) => p.name).toList(),
+                                chat: chat,
                                 chatController: chatController,
                               ),
                             ),

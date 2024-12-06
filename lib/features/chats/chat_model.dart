@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chat/features/chats/local_chatter_model.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/features/scenes/scene_model.dart';
@@ -42,4 +44,19 @@ class Chat {
       participants[index] = participants[index].copyWith(objective: objective, mood: mood);
     }
   }
+
+  // Convert Chat to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'subject': subject,
+      'meetingReason': meetingReason,
+      'id': id,
+      'scene': scene.toJson(),
+      'participants': participants.map((p) => p.toJson()).toList(),
+      'messages': messages.map((m) => m.toMap()).toList(),
+    };
+  }
+
+  // Optional: Convert Chat to JSON String
+  String toJsonString() => json.encode(toJson());
 }
