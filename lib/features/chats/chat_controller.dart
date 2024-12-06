@@ -1,4 +1,5 @@
 import 'package:chat/data/chat_service.dart';
+import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:chat/features/chats/chat_model.dart';
@@ -34,6 +35,8 @@ class ChatController with ChangeNotifier {
     final db = await DBHelper().database;
     final chatMaps = await db.query('chats');
     final participantMaps = await db.query('chat_participants');
+    final messageMaps = await db.query('messages'); // Fetch all messages
+
 
     // Fetch scenes via the ScenesController
     await scenesController.fetchScenes();
@@ -98,6 +101,17 @@ class ChatController with ChangeNotifier {
         (scene) => scene.id == sceneId,
         orElse: () => Scene(id: sceneId, name: 'Unknown Scene'),
       );
+      
+      final messages = messageMaps
+        .where((m) => m['chatId'] == chatId)
+        .map((m) => Message(
+              id: m['id'].toString(),
+              chatId: m['chatId'] as String,
+              sender: m['sender'] as String,
+              content: m['content'] as String,
+              timestamp: DateTime.parse(m['timestamp'] as String), 
+            ))
+        .toList();
 
       return Chat(
         id: chatId,
@@ -105,7 +119,7 @@ class ChatController with ChangeNotifier {
         meetingReason: chatMap['meetingReason'] as String,
         scene: scene, // Use the dynamically fetched scene
         participants: participants,
-        messages: [], // Placeholder for messages
+        messages: messages, // Placeholder for messages
       );
     }).toList();
 
