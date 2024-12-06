@@ -1,4 +1,4 @@
-import 'package:chat/features/chats/services/chat_service.dart';
+import 'package:chat/data/chat_service.dart';
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:chat/features/chats/chat_model.dart';
