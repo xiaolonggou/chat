@@ -22,7 +22,7 @@ class ChatService {
   // Sends a message to the backend and returns the reply or null in case of failure
   Future<String?> sendMessage(String message) async {
     try {
-      final uri = Uri.parse('$serverUrl/api/sendMessage'); // Use the server URL and API endpoint
+      final uri = Uri.parse('$serverUrl/api/message'); // Use the server URL and API endpoint
 
       // Send the request to the backend
       final response = await http.post(
