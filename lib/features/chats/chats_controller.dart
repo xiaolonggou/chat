@@ -8,14 +8,14 @@ import 'package:chat/features/scenes/scene_model.dart';
 import 'package:chat/features/scenes/scenes_controller.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
 
-class ChatController with ChangeNotifier {
+class ChatsController with ChangeNotifier {
   final ScenesController scenesController;
   final ChattersController chattersController;
   final ChatService chatService;
   List<Chat> chats = [];
 
   // Constructor now also requires the ChattersController
-  ChatController({
+  ChatsController({
     required this.scenesController,
     required this.chattersController,
     required this.chatService,

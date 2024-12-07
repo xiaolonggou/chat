@@ -76,7 +76,7 @@ Future<void> _onCreate(Database db, int version) async {
     // Create `messages` table with a foreign key reference to `chats`
     await db.execute('''
       CREATE TABLE messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Unique identifier for each message
+        id TEXT PRIMARY KEY,  -- Unique identifier for each message
         chatId TEXT NOT NULL,                  -- Reference to the associated chat
         sender TEXT NOT NULL,                  -- Who sent the message
         content TEXT NOT NULL,                 -- The message content
@@ -130,7 +130,7 @@ Future<void> _onCreate(Database db, int version) async {
     }
   }
 
-Future<void> insertMessage(String sender, String chatId, String content, DateTime timestamp) async {
+Future<void> insertMessage(Message m) async {
   try {
     final db = await database; // Get the database instance
 
@@ -138,33 +138,16 @@ Future<void> insertMessage(String sender, String chatId, String content, DateTim
     await db.insert(
       'messages',
       {
-        'sender': sender,
-        'chatId': chatId,
-        'content': content,
-        'timestamp': timestamp.toIso8601String(), // Convert timestamp to ISO format
+        'id': m.id,
+        'sender': m.sender,
+        'chatId': m.chatId,
+        'content': m.content,
+        'timestamp': m.timestamp.toIso8601String(), // Convert timestamp to ISO format
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    print('Message inserted successfully for chatId: $chatId');
-  } catch (e) {
-    print('Error inserting message: $e');
-    rethrow; // Re-throw the error for further handling if necessary
-  }
-}
-
-Future<void> insertMessageWithMessage(Message message) async {
-  try {
-    final db = await database; // Get the database instance
-
-    // Insert the message into the `messages` table
-    await db.insert(
-      'messages',
-      message.toMap(), // Use the toMap() method from the Message class to get the message data
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    print('Message inserted successfully for chatId: ${message.chatId}');
+    print('Message inserted successfully for chatId: $m.chatId');
   } catch (e) {
     print('Error inserting message: $e');
     rethrow; // Re-throw the error for further handling if necessary

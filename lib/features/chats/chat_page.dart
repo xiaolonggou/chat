@@ -4,16 +4,16 @@ import 'package:chat/shared/utils/db_helper.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/features/chats/widgets/message_bubble.dart';
 import 'package:chat/features/chats/widgets/chat_input_field.dart';
-import 'package:chat/features/chats/chat_controller.dart'; // Ensure this import is correct
+import 'package:chat/features/chats/chats_controller.dart'; // Ensure this import is correct
 
 class ChatPage extends StatefulWidget {
   final Chat chat; // Pass the entire Chat object
-  final ChatController chatController; // Pass ChatController
+  final ChatsController chatsController; // Pass ChatController
 
   const ChatPage({
     super.key,
     required this.chat,
-    required this.chatController,
+    required this.chatsController,
   });
 
   @override
@@ -66,10 +66,10 @@ Future<void> _sendMessage() async {
     });
 
     // Insert the message into the local database
-    await DBHelper().insertMessage(newMessage.sender, newMessage.chatId, newMessage.content, newMessage.timestamp);
+    await DBHelper().insertMessage(newMessage);
 
     // Send the updated Chat object to the server
-    await widget.chatController.sendMessage(widget.chat);
+    await widget.chatsController.sendMessage(widget.chat);
 
     _messageController.clear(); // Clear the input field
   } catch (e) {

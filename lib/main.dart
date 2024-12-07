@@ -2,7 +2,7 @@ import 'package:chat/data/api_chatters_repository.dart';
 import 'package:chat/data/api_scenes_repository.dart';
 import 'package:chat/data/mock_chatters_repository.dart';
 import 'package:chat/data/mock_scenes_repository.dart';
-import 'package:chat/features/chats/chat_controller.dart';
+import 'package:chat/features/chats/chats_controller.dart';
 import 'package:chat/data/chat_service.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
 import 'package:chat/features/chatters/chatters_page.dart';
@@ -35,7 +35,7 @@ void main() async {
   final chattersController = ChattersController(repository: chattersRepository);
   final scenesController = ScenesController(repository: scenesRepository);
   final chatService = ChatService(serverUrl: serverUrl);
-  final chatController = ChatController(scenesController:scenesController, chattersController: chattersController, chatService: chatService);
+  final chatController = ChatsController(scenesController:scenesController, chattersController: chattersController, chatService: chatService);
 
   runApp(MyApp(
     chattersController: chattersController,
@@ -60,7 +60,7 @@ Future<bool> _shouldUseMockData(String serverUrl) async {
 class MyApp extends StatelessWidget {
   final ChattersController chattersController;
   final ScenesController scenesController;
-  final ChatController chatController;
+  final ChatsController chatController;
   final bool useMockData;
 
   MyApp({

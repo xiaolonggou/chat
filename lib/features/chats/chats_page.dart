@@ -1,7 +1,7 @@
 import 'package:chat/features/chats/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:chat/features/chats/chat_controller.dart';
+import 'package:chat/features/chats/chats_controller.dart';
 import 'package:chat/features/chats/addChatPage.dart';
 import 'package:chat/features/scenes/scenes_controller.dart';
 import 'package:chat/features/chatters/chatters_controller.dart';
@@ -21,7 +21,7 @@ class _ChatsPageState extends State<ChatsPage> {
   }
 
   Future<void> _loadChats() async {
-    final chatController = Provider.of<ChatController>(context, listen: false);
+    final chatController = Provider.of<ChatsController>(context, listen: false);
     try {
       await chatController.loadChats(); // Load chats from the database
     } catch (e) {
@@ -33,7 +33,7 @@ class _ChatsPageState extends State<ChatsPage> {
   }
 
   Future<void> _deleteChat(String chatId) async {
-    final chatController = Provider.of<ChatController>(context, listen: false);
+    final chatController = Provider.of<ChatsController>(context, listen: false);
     try {
       await chatController.deleteChat(chatId); // Call the delete function
       await _loadChats(); // Reload chats after deletion
@@ -47,7 +47,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final chatController = Provider.of<ChatController>(context);
+    final chatController = Provider.of<ChatsController>(context);
     final scenesController = Provider.of<ScenesController>(context);
     final chattersController = Provider.of<ChattersController>(context);
 
@@ -108,7 +108,7 @@ class _ChatsPageState extends State<ChatsPage> {
                             MaterialPageRoute(
                               builder: (context) => ChatPage(
                                 chat: chat,
-                                chatController: chatController,
+                                chatsController: chatController,
                               ),
                             ),
                           );
