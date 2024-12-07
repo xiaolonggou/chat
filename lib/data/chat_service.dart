@@ -39,7 +39,7 @@ Future<String?> sendMessage(Chat chat) async {
     if (response.statusCode == 200) {
       // Parse and return the server's reply
       final responseBody = json.decode(response.body);
-      return responseBody['reply'];
+      return responseBody.toString();
     } else {
       print('Error: Backend returned status code ${response.statusCode}');
       return null;
