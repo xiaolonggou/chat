@@ -5,7 +5,6 @@ import 'package:chat/features/chats/widgets/message_bubble.dart';
 import 'package:chat/features/chats/widgets/chat_input_field.dart';
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:chat/features/chats/chats_controller.dart';
-import 'package:sqflite/sqflite.dart';
 
 class ChatPage extends StatefulWidget {
   final Chat chat;
