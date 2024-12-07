@@ -51,4 +51,13 @@ class Message {
     final map = json.decode(jsonStr); // Decode JSON string to Map
     return Message.fromMap(map); // Create Message from map
   }
+    Message copyWith({required String id}) {
+    return Message(
+      id: id,
+      chatId: chatId,
+      sender: sender,
+      content: content,
+      timestamp: timestamp,
+    );
+  }
 }

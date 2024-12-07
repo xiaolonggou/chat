@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:uuid/uuid.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();
@@ -130,7 +131,9 @@ Future<void> _onCreate(Database db, int version) async {
     }
   }
 
-Future<void> insertMessage(Message m) async {
+Future<String> insertMessage(Message m) async {
+  // Generate a unique ID using UUID
+  String generatedId = Uuid().v4();
   try {
     final db = await database; // Get the database instance
 
@@ -138,7 +141,7 @@ Future<void> insertMessage(Message m) async {
     await db.insert(
       'messages',
       {
-        'id': m.id,
+        'id': generatedId,
         'sender': m.sender,
         'chatId': m.chatId,
         'content': m.content,
@@ -147,7 +150,8 @@ Future<void> insertMessage(Message m) async {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    print('Message inserted successfully for chatId: $m.chatId');
+    print('Message inserted successfully with ID:$generatedId');
+    return generatedId;
   } catch (e) {
     print('Error inserting message: $e');
     rethrow; // Re-throw the error for further handling if necessary

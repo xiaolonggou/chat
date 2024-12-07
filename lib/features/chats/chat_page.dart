@@ -1,14 +1,15 @@
-import 'package:chat/features/chats/chat_model.dart';
 import 'package:flutter/material.dart';
-import 'package:chat/shared/utils/db_helper.dart';
+import 'package:chat/features/chats/chat_model.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/features/chats/widgets/message_bubble.dart';
 import 'package:chat/features/chats/widgets/chat_input_field.dart';
-import 'package:chat/features/chats/chats_controller.dart'; // Ensure this import is correct
+import 'package:chat/shared/utils/db_helper.dart';
+import 'package:chat/features/chats/chats_controller.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ChatPage extends StatefulWidget {
-  final Chat chat; // Pass the entire Chat object
-  final ChatsController chatsController; // Pass ChatController
+  final Chat chat;
+  final ChatsController chatsController;
 
   const ChatPage({
     super.key,
@@ -22,64 +23,69 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  List<Message> messages = [];
 
   @override
   void initState() {
     super.initState();
-    _loadMessages(); // Load messages when the page initializes
+    _loadMessages();
   }
 
-  // Load messages from the database
+  // Load messages for the current chat from the database
   Future<void> _loadMessages() async {
     try {
       final dbMessages = await DBHelper().fetchMessages(widget.chat.id);
       setState(() {
-        messages = dbMessages;
+        widget.chat.messages = dbMessages;
       });
     } catch (e) {
       print('Error loading messages: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load messages.')),
+        const SnackBar(content: Text('Failed to load messages.')),
       );
     }
   }
 
-Future<void> _sendMessage() async {
-  final messageText = _messageController.text.trim();
+  // Send a new message
+  Future<void> _sendMessage() async {
+    final messageText = _messageController.text.trim();
 
-  if (messageText.isEmpty) return;
+    if (messageText.isEmpty) return;
 
-  final timestamp = DateTime.now();
-  final newMessage = Message(
-    id: UniqueKey().toString(), // Generate a unique ID for the message
-    chatId: widget.chat.id,
-    sender: 'You', // Assume the current user is the sender
-    content: messageText,
-    timestamp: timestamp,
-  );
-
-  try {
-    // Add the message to the Chat object
-    setState(() {
-      widget.chat.messages.add(newMessage);
-    });
-
-    // Insert the message into the local database
-    await DBHelper().insertMessage(newMessage);
-
-    // Send the updated Chat object to the server
-    await widget.chatsController.sendMessage(widget.chat);
-
-    _messageController.clear(); // Clear the input field
-  } catch (e) {
-    print('Error sending message: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to send message.')),
+    final timestamp = DateTime.now();
+    final newMessage = Message(
+      id: '', // Placeholder ID
+      chatId: widget.chat.id,
+      sender: 'You',
+      content: messageText,
+      timestamp: timestamp,
     );
-  }
-}
 
+    try {
+      // Add the message locally
+      setState(() {
+        widget.chat.messages.insert(0,newMessage);
+      });
+
+      // Insert the message into the database
+      final messageId = await DBHelper().insertMessage(newMessage);
+      // Update the message with the generated ID
+      final updatedMessage = newMessage.copyWith(id: messageId.toString());
+      setState(() {
+        final index = widget.chat.messages.indexOf(newMessage);
+        if (index != -1) widget.chat.messages[index] = updatedMessage;
+      });
+
+      // Optionally, sync with the server
+      await widget.chatsController.sendMessage(widget.chat);
+
+      _messageController.clear();
+    } catch (e) {
+      print('Error sending message: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to send message.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,15 +95,14 @@ Future<void> _sendMessage() async {
       ),
       body: Column(
         children: [
-          // Message list
+          // Message List
           Expanded(
             child: ListView.builder(
-              itemCount: messages.length,
-              reverse: true, // Messages loaded in the correct order
+              itemCount: widget.chat.messages.length,
+              reverse: true,
               itemBuilder: (context, index) {
-                final message = messages[index];
-                final isMe = message.sender == 'You'; // Adjust based on sender
-
+                final message = widget.chat.messages[index];
+                final isMe = message.sender == 'You';
                 return MessageBubble(
                   message: message,
                   isMe: isMe,
@@ -105,7 +110,7 @@ Future<void> _sendMessage() async {
               },
             ),
           ),
-          // Input field
+          // Input Field
           ChatInputField(
             controller: _messageController,
             onSend: _sendMessage,

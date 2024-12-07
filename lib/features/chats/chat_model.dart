@@ -4,14 +4,13 @@ import 'package:chat/features/chats/local_chatter_model.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:chat/features/scenes/scene_model.dart';
 
-
 class Chat {
   final String subject;
   final String meetingReason;
   final String id;
   final Scene scene;
   final List<LocalChatter> participants; // List of LocalChatter for local metadata
-  final List<Message> messages;
+  List<Message> messages; // Make messages a non-final list
 
   Chat({
     required this.subject,
@@ -19,7 +18,7 @@ class Chat {
     required this.id,
     required this.scene, // Use Scene object for chat scene
     required this.participants, // List of LocalChatter objects
-    required this.messages,
+    required this.messages, // messages can now be modified directly
   });
 
   // Method to add a new message to the chat
