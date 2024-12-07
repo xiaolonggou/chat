@@ -34,6 +34,16 @@ class MessageBubble extends StatelessWidget {
                   crossAxisAlignment:
                       isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
+                    // Display the sender's name if the message is not from "You"
+                    if (!isMe) ...[
+                      Text(
+                        message.sender,  // Display sender's name
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 4), // Add spacing between sender name and message
+                    ],
                     // Timestamp
                     Text(
                       DateFormat('yyyy-MM-dd HH:mm').format(message.timestamp),

@@ -73,10 +73,9 @@ class _ChatPageState extends State<ChatPage> {
         final index = widget.chat.messages.indexOf(newMessage);
         if (index != -1) widget.chat.messages[index] = updatedMessage;
       });
-
-      // Optionally, sync with the server
+            // Optionally, sync with the server
       await widget.chatsController.sendMessage(widget.chat);
-
+      _loadMessages();
       _messageController.clear();
     } catch (e) {
       print('Error sending message: $e');
