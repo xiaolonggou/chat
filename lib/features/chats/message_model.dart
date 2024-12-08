@@ -5,7 +5,7 @@ import 'dart:convert'; // For JSON encoding and decoding
 class Message {
   final String id; // Unique ID for the message
   final String chatId; // The chat to which this message belongs
-  final String sender; // The sender of the message
+  final String senderId; // The sender of the message
   final String content; // The content of the message
   final DateTime timestamp; // The timestamp of the message
 
@@ -13,7 +13,7 @@ class Message {
   const Message({
     required this.id,
     required this.chatId,
-    required this.sender,
+    required this.senderId,
     required this.content,
     required this.timestamp,
   });
@@ -23,7 +23,7 @@ class Message {
     return {
       'id': id,
  //     'chatId': chatId, // Store the chatId to link the message to the correct chat
-      'sender': sender,
+      'senderId': senderId,
       'content': content,
       'timestamp': timestamp.toIso8601String(), // Convert timestamp to a string format
     };
@@ -34,7 +34,7 @@ class Message {
     return Message(
       id: map['id'],
       chatId: map['chatId'], // Fetch the associated chatId from the map
-      sender: map['sender'],
+      senderId: map['senderId'],
       content: map['content'],
       timestamp: DateTime.parse(map['timestamp']), // Parse timestamp back to DateTime
     );
@@ -55,7 +55,7 @@ class Message {
     return Message(
       id: id,
       chatId: chatId,
-      sender: sender,
+      senderId: senderId,
       content: content,
       timestamp: timestamp,
     );

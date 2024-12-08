@@ -79,7 +79,7 @@ Future<void> _onCreate(Database db, int version) async {
       CREATE TABLE messages (
         id TEXT PRIMARY KEY,  -- Unique identifier for each message
         chatId TEXT NOT NULL,                  -- Reference to the associated chat
-        sender TEXT NOT NULL,                  -- Who sent the message
+        senderId TEXT NOT NULL,                  -- Who sent the message
         content TEXT NOT NULL,                 -- The message content
         timestamp TEXT NOT NULL,               -- Timestamp of when the message was sent
         FOREIGN KEY (chatId) REFERENCES chats (id) ON DELETE CASCADE -- Maintain referential integrity
@@ -142,7 +142,7 @@ Future<String> insertMessage(Message m) async {
       'messages',
       {
         'id': generatedId,
-        'sender': m.sender,
+        'senderId': m.senderId,
         'chatId': m.chatId,
         'content': m.content,
         'timestamp': m.timestamp.toIso8601String(), // Convert timestamp to ISO format
@@ -175,7 +175,7 @@ Future<String> insertMessage(Message m) async {
       maps.length,
       (i) => Message(
         id: maps[i]['id'].toString(),
-        sender: maps[i]['sender'].toString(), // Adjust this as needed
+        senderId: maps[i]['senderId'].toString(), // Adjust this as needed
         content: maps[i]['content'].toString(),
         timestamp:DateTime.parse(maps[i]['timestamp'].toString()), 
         chatId: maps[i]['chatId'].toString(),

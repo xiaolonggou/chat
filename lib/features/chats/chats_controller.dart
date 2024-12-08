@@ -107,7 +107,7 @@ class ChatsController with ChangeNotifier {
         .map((m) => Message(
               id: m['id'].toString(),
               chatId: m['chatId'] as String,
-              sender: m['sender'] as String,
+              senderId: m['senderId'] as String,
               content: m['content'] as String,
               timestamp: DateTime.parse(m['timestamp'] as String), 
             ))

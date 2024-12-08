@@ -37,7 +37,7 @@ class MessageBubble extends StatelessWidget {
                     // Display the sender's name if the message is not from "You"
                     if (!isMe) ...[
                       Text(
-                        message.sender,  // Display sender's name
+                        message.senderId,  // Display sender's name
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),

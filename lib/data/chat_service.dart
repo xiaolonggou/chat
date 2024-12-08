@@ -34,7 +34,7 @@ class ChatService {
         headers: {'Content-Type': 'application/json'},
         body: chatJson,
       ).timeout(
-        Duration(seconds: 5),
+        Duration(seconds: 60),
         onTimeout: () => http.Response('Timeout', 408),
       );
 
@@ -79,7 +79,7 @@ class ChatService {
       final message = Message(
         id: messageData['backend_id'],  // Assuming backend_id is used as the local message ID
         chatId: chatId,
-        sender: messageData['sender_participant_id'],
+        senderId: messageData['sender_participant_id'].toString(),
         content: messageData['content'],
         timestamp: DateTime.now(),
       );

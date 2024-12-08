@@ -54,7 +54,7 @@ class _ChatPageState extends State<ChatPage> {
     final newMessage = Message(
       id: '', // Placeholder ID
       chatId: widget.chat.id,
-      sender: 'You',
+      senderId: 'You',
       content: messageText,
       timestamp: timestamp,
     );
@@ -100,7 +100,7 @@ class _ChatPageState extends State<ChatPage> {
               reverse: true,
               itemBuilder: (context, index) {
                 final message = widget.chat.messages[index];
-                final isMe = message.sender == 'You';
+                final isMe = message.senderId == 'You';
                 return MessageBubble(
                   message: message,
                   isMe: isMe,
