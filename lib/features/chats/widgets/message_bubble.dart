@@ -1,6 +1,9 @@
+import 'package:chat/features/chatters/chatters_controller.dart';
+import 'package:chat/features/chatters/chatters_model.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/features/chats/message_model.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -14,6 +17,20 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Access the ChattersController via Provider
+    final chattersController = Provider.of<ChattersController>(context);
+    
+    // Find the sender's name using senderId
+    String senderName = message.senderId; // Default to senderId if no name is found
+    final sender = chattersController.chatters.firstWhere(
+      (chatter) => chatter.id.toString() == message.senderId,
+      orElse: () => Chatter(id: -1, name: message.senderId, gender: '', job: '', personality: ''), // Fallback to senderId if no match
+    );
+    
+    if (sender.id != -1) {
+      senderName = sender.name; // Update senderName with the actual name if found
+    }
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -37,7 +54,7 @@ class MessageBubble extends StatelessWidget {
                     // Display the sender's name if the message is not from "You"
                     if (!isMe) ...[
                       Text(
-                        message.senderId,  // Display sender's name
+                        senderName,  // Display sender's name here
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
