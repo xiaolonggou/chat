@@ -22,7 +22,7 @@ class Message {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'chatId': chatId, // Store the chatId to link the message to the correct chat
+ //     'chatId': chatId, // Store the chatId to link the message to the correct chat
       'sender': sender,
       'content': content,
       'timestamp': timestamp.toIso8601String(), // Convert timestamp to a string format
