@@ -54,7 +54,7 @@ class _ChatPageState extends State<ChatPage> {
     final newMessage = Message(
       id: '', // Placeholder ID
       chatId: widget.chat.id,
-      senderId: 'You',
+      senderId: 'Me',
       content: messageText,
       timestamp: timestamp,
     );
@@ -62,7 +62,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       // Add the message locally
       setState(() {
-        widget.chat.messages.insert(0,newMessage);
+        widget.chat.messages.insert(0, newMessage);
       });
 
       // Insert the message into the database
@@ -73,7 +73,7 @@ class _ChatPageState extends State<ChatPage> {
         final index = widget.chat.messages.indexOf(newMessage);
         if (index != -1) widget.chat.messages[index] = updatedMessage;
       });
-            // Optionally, sync with the server
+      // Optionally, sync with the server
       await widget.chatsController.sendMessage(widget.chat);
       _loadMessages();
       _messageController.clear();
@@ -100,7 +100,7 @@ class _ChatPageState extends State<ChatPage> {
               reverse: true,
               itemBuilder: (context, index) {
                 final message = widget.chat.messages[index];
-                final isMe = message.senderId == 'You';
+                final isMe = message.senderId == 'Me';
                 return MessageBubble(
                   message: message,
                   isMe: isMe,
@@ -112,6 +112,7 @@ class _ChatPageState extends State<ChatPage> {
           ChatInputField(
             controller: _messageController,
             onSend: _sendMessage,
+            chatId: widget.chat.id,
           ),
         ],
       ),

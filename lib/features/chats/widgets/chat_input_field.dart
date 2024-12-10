@@ -1,14 +1,56 @@
+import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
 
 class ChatInputField extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
+  final String chatId; // Chat ID to delete messages from this chat
 
   const ChatInputField({
     super.key,
     required this.controller,
     required this.onSend,
+    required this.chatId, // Pass chatId to the widget
   });
+
+  // Delete all messages and ask for confirmation
+  Future<void> _deleteAllMessages(BuildContext context) async {
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete All Messages'),
+          content: const Text(
+              'Are you sure you want to delete all messages in this chat?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Cancel
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Confirm
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      // Call the method to delete messages from the database
+      try {
+        await DBHelper().deleteMessages(chatId);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All messages have been deleted.')),
+        );
+      } catch (e) {
+        print('Error deleting messages: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete messages.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +59,12 @@ class ChatInputField extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Leftmost delete button
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => _deleteAllMessages(context),
+          ),
+          // Message input field
           Expanded(
             child: TextField(
               controller: controller,
@@ -38,6 +86,7 @@ class ChatInputField extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
+          // Send button
           IconButton(
             icon: Icon(
               Icons.send,

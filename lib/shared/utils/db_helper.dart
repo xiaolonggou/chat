@@ -19,41 +19,41 @@ class DBHelper {
     _database = await _initDatabase();
     return _database!;
   }
-Future<Database> _initDatabase() async {
-  try {
-    // Get the path to the database directory
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'chat_app.db');
-    print('Database path: $path'); // Debugging purpose
 
-    // Ensure the directory exists
-    final directory = Directory(dbPath);
-    if (!directory.existsSync()) {
-      directory.createSync(recursive: true);
+  Future<Database> _initDatabase() async {
+    try {
+      // Get the path to the database directory
+      final dbPath = await getDatabasesPath();
+      final path = join(dbPath, 'chat_app.db');
+      print('Database path: $path'); // Debugging purpose
+
+      // Ensure the directory exists
+      final directory = Directory(dbPath);
+      if (!directory.existsSync()) {
+        directory.createSync(recursive: true);
+      }
+
+      // Open the database
+      return await openDatabase(
+        path,
+        version: 1,
+        readOnly: false,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+        onOpen: (db) async {
+          print('Database opened at: $path'); // Debugging purpose
+        },
+      );
+    } catch (e) {
+      print('Error initializing database: $e');
+      rethrow;
     }
-
-    // Open the database
-    return await openDatabase(
-      path,
-      version: 1,
-      readOnly: false,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-      onOpen: (db) async {
-        print('Database opened at: $path'); // Debugging purpose
-      },
-    );
-  } catch (e) {
-    print('Error initializing database: $e');
-    rethrow;
   }
-}
 
-
-Future<void> _onCreate(Database db, int version) async {
-  try {
-    // Create `chats` table
-    await db.execute('''
+  Future<void> _onCreate(Database db, int version) async {
+    try {
+      // Create `chats` table
+      await db.execute('''
       CREATE TABLE chats (
         id TEXT PRIMARY KEY,
         subject TEXT NOT NULL,
@@ -62,8 +62,8 @@ Future<void> _onCreate(Database db, int version) async {
       )
     ''');
 
-    // Create `chat_participants` table with a foreign key reference to `chats`
-    await db.execute('''
+      // Create `chat_participants` table with a foreign key reference to `chats`
+      await db.execute('''
       CREATE TABLE chat_participants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chatId TEXT NOT NULL,
@@ -74,8 +74,8 @@ Future<void> _onCreate(Database db, int version) async {
       )
     ''');
 
-    // Create `messages` table with a foreign key reference to `chats`
-    await db.execute('''
+      // Create `messages` table with a foreign key reference to `chats`
+      await db.execute('''
       CREATE TABLE messages (
         id TEXT PRIMARY KEY,  -- Unique identifier for each message
         chatId TEXT NOT NULL,                  -- Reference to the associated chat
@@ -86,14 +86,12 @@ Future<void> _onCreate(Database db, int version) async {
       )
     ''');
 
-
-    print('Database created successfully.'); // Debugging purpose
-  } catch (e) {
-    print('Error during database creation: $e');
-    rethrow;
+      print('Database created successfully.'); // Debugging purpose
+    } catch (e) {
+      print('Error during database creation: $e');
+      rethrow;
+    }
   }
-}
-
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     try {
@@ -131,60 +129,78 @@ Future<void> _onCreate(Database db, int version) async {
     }
   }
 
-Future<String> insertMessage(Message m) async {
-  // Generate a unique ID using UUID
-  String generatedId = Uuid().v4();
-  try {
-    final db = await database; // Get the database instance
+  Future<String> insertMessage(Message m) async {
+    // Generate a unique ID using UUID
+    String generatedId = Uuid().v4();
+    try {
+      final db = await database; // Get the database instance
 
-    // Insert the message into the `messages` table
-    await db.insert(
-      'messages',
-      {
-        'id': generatedId,
-        'senderId': m.senderId,
-        'chatId': m.chatId,
-        'content': m.content,
-        'timestamp': m.timestamp.toIso8601String(), // Convert timestamp to ISO format
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+      // Insert the message into the `messages` table
+      await db.insert(
+        'messages',
+        {
+          'id': generatedId,
+          'senderId': m.senderId,
+          'chatId': m.chatId,
+          'content': m.content,
+          'timestamp':
+              m.timestamp.toIso8601String(), // Convert timestamp to ISO format
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    print('Message inserted successfully with ID:$generatedId');
-    return generatedId;
-  } catch (e) {
-    print('Error inserting message: $e');
-    rethrow; // Re-throw the error for further handling if necessary
+      print('Message inserted successfully with ID:$generatedId');
+      return generatedId;
+    } catch (e) {
+      print('Error inserting message: $e');
+      rethrow; // Re-throw the error for further handling if necessary
+    }
   }
-}
 
   Future<List<Message>> fetchMessages(String chatId) async {
-  try {
-    final db = await database;
+    try {
+      final db = await database;
 
-    // Query messages for the given chatId
-    final maps = await db.query(
-      'messages',
-      where: 'chatId = ?',
-      whereArgs: [chatId],
-      orderBy: 'timestamp DESC', // Order by timestamp descending
-    );
+      // Query messages for the given chatId
+      final maps = await db.query(
+        'messages',
+        where: 'chatId = ?',
+        whereArgs: [chatId],
+        orderBy: 'timestamp DESC', // Order by timestamp descending
+      );
 
-    // Convert the map results to Message objects
-    return List.generate(
-      maps.length,
-      (i) => Message(
-        id: maps[i]['id'].toString(),
-        senderId: maps[i]['senderId'].toString(), // Adjust this as needed
-        content: maps[i]['content'].toString(),
-        timestamp:DateTime.parse(maps[i]['timestamp'].toString()), 
-        chatId: maps[i]['chatId'].toString(),
-      ),
-    );
-  } catch (e) {
-    print('Error fetching messages: $e');
-    rethrow;
+      // Convert the map results to Message objects
+      return List.generate(
+        maps.length,
+        (i) => Message(
+          id: maps[i]['id'].toString(),
+          senderId: maps[i]['senderId'].toString(), // Adjust this as needed
+          content: maps[i]['content'].toString(),
+          timestamp: DateTime.parse(maps[i]['timestamp'].toString()),
+          chatId: maps[i]['chatId'].toString(),
+        ),
+      );
+    } catch (e) {
+      print('Error fetching messages: $e');
+      rethrow;
+    }
   }
-}
 
+  Future<void> deleteMessages(String chatId) async {
+    try {
+      final db = await database;
+
+      // Delete all messages for the specified chatId
+      await db.delete(
+        'messages',
+        where: 'chatId = ?', // Condition for deleting messages
+        whereArgs: [chatId], // Value for the condition (chatId)
+      );
+
+      print('Messages deleted successfully for chatId: $chatId');
+    } catch (e) {
+      print('Error deleting messages: $e');
+      rethrow; // Re-throw the error for further handling if necessary
+    }
+  }
 }
