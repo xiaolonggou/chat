@@ -73,6 +73,7 @@ class _ChatPageState extends State<ChatPage> {
         final index = widget.chat.messages.indexOf(newMessage);
         if (index != -1) widget.chat.messages[index] = updatedMessage;
       });
+
       // Optionally, sync with the server
       await widget.chatsController.sendMessage(widget.chat);
       _loadMessages();
@@ -83,6 +84,13 @@ class _ChatPageState extends State<ChatPage> {
         const SnackBar(content: Text('Failed to send message.')),
       );
     }
+  }
+
+  // Method to refresh the page
+  void _refreshPage() {
+    setState(() {
+      _loadMessages();
+    });
   }
 
   @override
@@ -108,11 +116,12 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-          // Input Field
+          // Input Field with delete and send actions
           ChatInputField(
             controller: _messageController,
             onSend: _sendMessage,
             chatId: widget.chat.id,
+            refreshChatPage: _refreshPage, // Pass refresh callback
           ),
         ],
       ),

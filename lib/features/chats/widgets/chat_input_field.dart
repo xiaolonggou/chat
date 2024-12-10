@@ -1,16 +1,19 @@
 import 'package:chat/shared/utils/db_helper.dart';
 import 'package:flutter/material.dart';
+// Import Chat model to reload chat data
 
 class ChatInputField extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
   final String chatId; // Chat ID to delete messages from this chat
+  final Function refreshChatPage; // Callback to refresh chat page
 
   const ChatInputField({
     super.key,
     required this.controller,
     required this.onSend,
     required this.chatId, // Pass chatId to the widget
+    required this.refreshChatPage, // Pass the refresh callback to refresh chat page
   });
 
   // Delete all messages and ask for confirmation
@@ -40,9 +43,12 @@ class ChatInputField extends StatelessWidget {
       // Call the method to delete messages from the database
       try {
         await DBHelper().deleteMessages(chatId);
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('All messages have been deleted.')),
         );
+        // Refresh the chat page by calling the callback function
+        refreshChatPage(); // Trigger the page refresh after deletion
       } catch (e) {
         print('Error deleting messages: $e');
         ScaffoldMessenger.of(context).showSnackBar(
