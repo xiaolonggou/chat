@@ -2,8 +2,8 @@
 import 'package:chat/features/chatters/chatters_model.dart';
 
 class LocalChatter extends Chatter {
-  final String? objective;
-  final String? mood;
+  String? objective;
+  String? mood;
 
   // Constructor to initialize LocalChatter, passing parameters to the Chatter constructor
   LocalChatter({

@@ -5,7 +5,8 @@ import 'package:chat/features/chatters/chatters_controller.dart';
 import 'package:chat/features/scenes/scene_model.dart';
 import 'package:chat/features/chatters/chatters_model.dart';
 import 'package:chat/features/chats/local_chatter_model.dart';
-import 'package:chat/features/chats/chat_model.dart'; // Import Chat model
+import 'package:chat/features/chats/chat_model.dart';
+import 'package:sqflite/sqflite.dart'; // Import Chat model
 
 class AddChatPage extends StatefulWidget {
   final ScenesController scenesController;
@@ -40,15 +41,19 @@ class _AddChatPageState extends State<AddChatPage> {
     _chattersFuture = widget.chattersController.repository.fetchChatters();
 
     if (widget.chat != null) {
-      // Populate form fields for editing
-      _subjectController.text = widget.chat!.subject;
-      _meetingReasonController.text = widget.chat!.meetingReason;
-      _selectedScene = widget.chat!.scene;
-      _selectedChatters.addAll(widget.chat!.participants);
+      _populateFormWithExistingChat();
     }
   }
 
-  /// Validates the form fields
+  // Populate the form with existing chat data
+  void _populateFormWithExistingChat() {
+    _subjectController.text = widget.chat!.subject;
+    _meetingReasonController.text = widget.chat!.meetingReason;
+    _selectedScene = widget.chat!.scene;
+    _selectedChatters.addAll(widget.chat!.participants);
+  }
+
+  // Check if the form is valid
   bool _isFormValid() {
     return _subjectController.text.isNotEmpty &&
         _meetingReasonController.text.isNotEmpty &&
@@ -56,57 +61,15 @@ class _AddChatPageState extends State<AddChatPage> {
         _selectedChatters.isNotEmpty;
   }
 
-  /// Saves the chat to the database
+  // Save or update the chat based on whether it's a new or existing chat
   Future<void> _saveChat() async {
     if (_isFormValid()) {
       final db = await DBHelper().database;
 
       if (widget.chat == null) {
-        // Creating a new chat
-        final chatId = DateTime.now().millisecondsSinceEpoch.toString();
-
-        await db.insert('chats', {
-          'id': chatId,
-          'subject': _subjectController.text,
-          'meetingReason': _meetingReasonController.text,
-          'sceneId': _selectedScene!.id,
-        });
-
-        for (final chatter in _selectedChatters) {
-          await db.insert('chat_participants', {
-            'chatId': chatId,
-            'participantId': chatter.id,
-            'objective': chatter.objective,
-            'mood': chatter.mood,
-          });
-        }
-
-        _showSnackbar('Chat created successfully');
+        await _createChat(db);
       } else {
-        // Editing an existing chat
-        await db.update(
-          'chats',
-          {
-            'subject': _subjectController.text,
-            'meetingReason': _meetingReasonController.text,
-            'sceneId': _selectedScene!.id,
-          },
-          where: 'id = ?',
-          whereArgs: [widget.chat!.id],
-        );
-
-        // Replace participants
-        await db.delete('chat_participants', where: 'chatId = ?', whereArgs: [widget.chat!.id]);
-        for (final chatter in _selectedChatters) {
-          await db.insert('chat_participants', {
-            'chatId': widget.chat!.id,
-            'participantId': chatter.id,
-            'objective': chatter.objective,
-            'mood': chatter.mood,
-          });
-        }
-
-        _showSnackbar('Chat updated successfully');
+        await _updateChat(db);
       }
 
       Navigator.of(context).pop(true);
@@ -115,9 +78,103 @@ class _AddChatPageState extends State<AddChatPage> {
     }
   }
 
-  /// Shows a snackbar with a message
+  // Create a new chat
+  Future<void> _createChat(Database db) async {
+    final chatId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    await db.insert('chats', {
+      'id': chatId,
+      'subject': _subjectController.text,
+      'meetingReason': _meetingReasonController.text,
+      'sceneId': _selectedScene!.id,
+    });
+
+    for (final chatter in _selectedChatters) {
+      await db.insert('chat_participants', {
+        'chatId': chatId,
+        'participantId': chatter.id,
+        'objective': chatter.objective,
+        'mood': chatter.mood,
+      });
+    }
+
+    _showSnackbar('Chat created successfully');
+  }
+
+  // Update an existing chat
+  Future<void> _updateChat(Database db) async {
+    await db.update(
+      'chats',
+      {
+        'subject': _subjectController.text,
+        'meetingReason': _meetingReasonController.text,
+        'sceneId': _selectedScene!.id,
+      },
+      where: 'id = ?',
+      whereArgs: [widget.chat!.id],
+    );
+
+    // Replace participants
+    await db.delete('chat_participants', where: 'chatId = ?', whereArgs: [widget.chat!.id]);
+    for (final chatter in _selectedChatters) {
+      await db.insert('chat_participants', {
+        'chatId': widget.chat!.id,
+        'participantId': chatter.id,
+        'objective': chatter.objective,
+        'mood': chatter.mood,
+      });
+    }
+
+    _showSnackbar('Chat updated successfully');
+  }
+
+  // Show a snackbar with a message
   void _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // Edit chatter's objective and mood
+  void _showEditDialog(LocalChatter chatter) {
+    final objectiveController = TextEditingController(text: chatter.objective);
+    final moodController = TextEditingController(text: chatter.mood);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Chatter: ${chatter.name}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: objectiveController,
+                decoration: const InputDecoration(labelText: 'Objective'),
+              ),
+              TextField(
+                controller: moodController,
+                decoration: const InputDecoration(labelText: 'Mood'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  chatter.objective = objectiveController.text;
+                  chatter.mood = moodController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -149,73 +206,15 @@ class _AddChatPageState extends State<AddChatPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    TextField(
-                      controller: _subjectController,
-                      decoration: const InputDecoration(
-                        labelText: 'Subject',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                    _buildTextField(_subjectController, 'Subject', 'Enter chat subject'),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _meetingReasonController,
-                      decoration: const InputDecoration(
-                        labelText: 'Reason for Meeting',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                    _buildTextField(_meetingReasonController, 'Reason for Meeting', 'Enter reason for meeting'),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<Scene>(
-                      decoration: const InputDecoration(
-                        labelText: 'Select Scene',
-                        border: OutlineInputBorder(),
-                      ),
-                      value: _selectedScene,
-                      onChanged: (Scene? newScene) => setState(() => _selectedScene = newScene),
-                      items: scenes.map((scene) {
-                        return DropdownMenuItem<Scene>(
-                          value: scene,
-                          child: Text(scene.name ?? 'Unknown'),
-                        );
-                      }).toList(),
-                    ),
+                    _buildSceneDropdown(scenes),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<Chatter>(
-                      decoration: const InputDecoration(
-                        labelText: 'Select Chatter',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (Chatter? chatter) {
-                        if (chatter != null) {
-                          setState(() => _selectedChatters.add(LocalChatter.fromChatter(chatter)));
-                        }
-                      },
-                      items: chatters.map((chatter) {
-                        return DropdownMenuItem<Chatter>(
-                          value: chatter,
-                          child: Text(chatter.name),
-                        );
-                      }).toList(),
-                    ),
+                    _buildChatterDropdown(chatters),
                     const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: _selectedChatters.length,
-                        itemBuilder: (context, index) {
-                          final chatter = _selectedChatters[index];
-                          return ListTile(
-                            title: Text(chatter.name),
-                            subtitle: Text('Objective: ${chatter.objective ?? "Not set"}, Mood: ${chatter.mood ?? "Not set"}'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                // Add edit logic
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                    _buildSelectedChattersList(),
                     ElevatedButton(
                       onPressed: _saveChat,
                       child: Text(widget.chat == null ? 'Create Chat' : 'Update Chat'),
@@ -224,6 +223,79 @@ class _AddChatPageState extends State<AddChatPage> {
                 ),
               );
             },
+          );
+        },
+      ),
+    );
+  }
+
+  // Helper method for text fields
+  Widget _buildTextField(TextEditingController controller, String label, String hint) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
+  // Build scene dropdown
+  Widget _buildSceneDropdown(List<Scene> scenes) {
+    return DropdownButtonFormField<Scene>(
+      decoration: const InputDecoration(
+        labelText: 'Select Scene',
+        border: OutlineInputBorder(),
+      ),
+      value: _selectedScene,
+      onChanged: (Scene? newScene) => setState(() => _selectedScene = newScene),
+      items: scenes.map((scene) {
+        return DropdownMenuItem<Scene>(
+          value: scene,
+          child: Text(scene.name ?? 'Unknown'),
+        );
+      }).toList(),
+    );
+  }
+
+  // Build chatter dropdown
+  Widget _buildChatterDropdown(List<Chatter> chatters) {
+    return DropdownButtonFormField<Chatter>(
+      decoration: const InputDecoration(
+        labelText: 'Select Chatter',
+        border: OutlineInputBorder(),
+      ),
+      onChanged: (Chatter? chatter) {
+        if (chatter != null) {
+          setState(() => _selectedChatters.add(LocalChatter.fromChatter(chatter)));
+        }
+      },
+      items: chatters.map((chatter) {
+        return DropdownMenuItem<Chatter>(
+          value: chatter,
+          child: Text(chatter.name),
+        );
+      }).toList(),
+    );
+  }
+
+  // Build selected chatters list
+  Widget _buildSelectedChattersList() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _selectedChatters.length,
+        itemBuilder: (context, index) {
+          final chatter = _selectedChatters[index];
+          return ListTile(
+            title: Text(chatter.name),
+            subtitle: Text('Objective: ${chatter.objective ?? "Not set"}, Mood: ${chatter.mood ?? "Not set"}'),
+            trailing: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                _showEditDialog(chatter);
+              },
+            ),
           );
         },
       ),
