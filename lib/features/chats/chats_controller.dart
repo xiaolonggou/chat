@@ -89,6 +89,7 @@ class ChatsController with ChangeNotifier {
           personality: chatter.personality,
           objective: p['objective'] as String?,
           mood: p['mood'] as String?,
+          yearOfBirth: chatter.yearOfBirth,
         );
       }).toList();
       

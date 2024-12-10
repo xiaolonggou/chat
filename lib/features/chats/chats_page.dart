@@ -47,7 +47,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final chatController = Provider.of<ChatsController>(context);
+    final chatsController = Provider.of<ChatsController>(context);
     final scenesController = Provider.of<ScenesController>(context);
     final chattersController = Provider.of<ChattersController>(context);
 
@@ -57,12 +57,12 @@ class _ChatsPageState extends State<ChatsPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : chatController.chats.isEmpty
+          : chatsController.chats.isEmpty
               ? const Center(child: Text('No chats available'))
               : ListView.builder(
-                  itemCount: chatController.chats.length,
+                  itemCount: chatsController.chats.length,
                   itemBuilder: (context, index) {
-                    final chat = chatController.chats[index];
+                    final chat = chatsController.chats[index];
 
                     return Dismissible(
                       key: Key(chat.id), // Use a unique key for each item
@@ -108,7 +108,7 @@ class _ChatsPageState extends State<ChatsPage> {
                             MaterialPageRoute(
                               builder: (context) => ChatPage(
                                 chat: chat,
-                                chatsController: chatController,
+                                chatsController: chatsController,
                               ),
                             ),
                           );

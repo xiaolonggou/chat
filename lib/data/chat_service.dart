@@ -27,6 +27,7 @@ class ChatService {
 
       // Serialize the Chat object to JSON
       final chatJson = chat.toJsonString();
+      print(chatJson);
 
       // Send the JSON payload to the backend
       final response = await http.post(
