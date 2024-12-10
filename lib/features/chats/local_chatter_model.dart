@@ -76,4 +76,17 @@ class LocalChatter extends Chatter {
       mood: mood ?? this.mood,
     );
   }
+
+  static LocalChatter fromChatter(Chatter chatter) {
+  return LocalChatter(
+    id: chatter.id,
+    name: chatter.name,
+    gender: chatter.gender,
+    yearOfBirth: chatter.yearOfBirth,
+    job: chatter.job,
+    personality: chatter.personality,
+    objective: null, // Default value or modify as needed
+    mood: null,      // Default value or modify as needed
+  );
+}
 }

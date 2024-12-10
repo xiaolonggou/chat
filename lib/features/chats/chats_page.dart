@@ -97,9 +97,23 @@ class _ChatsPageState extends State<ChatsPage> {
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              // Navigate to edit page (implement your own edit page if needed)
-                            },
+
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddChatPage(
+                                  chat: chat, // Pass the chat to edit
+                                  scenesController: scenesController,
+                                  chattersController: chattersController,
+                                ),
+                              ),
+                            );
+
+                            if (result == true) {
+                              _loadChats(); // Refresh chats after editing
+                            }
+                           },
                           ),
                           onTap: () {
                           // Navigate to ChatPage with chat details
