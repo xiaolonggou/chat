@@ -23,7 +23,7 @@ class _ChatsPageState extends State<ChatsPage> {
   Future<void> _loadChats() async {
     final chatController = Provider.of<ChatsController>(context, listen: false);
     try {
-      await chatController.loadChats(); // Load chats from the database
+      await chatController.loadChats(context); // Load chats from the database
     } catch (e) {
       print('Error loading chats: $e');
     }
@@ -66,7 +66,8 @@ class _ChatsPageState extends State<ChatsPage> {
 
                     return Dismissible(
                       key: Key(chat.id), // Use a unique key for each item
-                      direction: DismissDirection.endToStart, // Swipe left to delete
+                      direction:
+                          DismissDirection.endToStart, // Swipe left to delete
                       background: Container(
                         color: Colors.red,
                         alignment: Alignment.centerRight,
@@ -80,7 +81,8 @@ class _ChatsPageState extends State<ChatsPage> {
                         );
                       },
                       child: Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
                         child: ListTile(
                           title: Text(chat.subject),
                           subtitle: Column(
@@ -97,36 +99,35 @@ class _ChatsPageState extends State<ChatsPage> {
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.edit),
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddChatPage(
+                                    chat: chat, // Pass the chat to edit
+                                    scenesController: scenesController,
+                                    chattersController: chattersController,
+                                  ),
+                                ),
+                              );
 
-                          onPressed: () async {
-                            final result = await Navigator.push(
+                              if (result == true) {
+                                _loadChats(); // Refresh chats after editing
+                              }
+                            },
+                          ),
+                          onTap: () {
+                            // Navigate to ChatPage with chat details
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AddChatPage(
-                                  chat: chat, // Pass the chat to edit
-                                  scenesController: scenesController,
-                                  chattersController: chattersController,
+                                builder: (context) => ChatPage(
+                                  chat: chat,
+                                  chatsController: chatsController,
                                 ),
                               ),
                             );
-
-                            if (result == true) {
-                              _loadChats(); // Refresh chats after editing
-                            }
-                           },
-                          ),
-                          onTap: () {
-                          // Navigate to ChatPage with chat details
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                chat: chat,
-                                chatsController: chatsController,
-                              ),
-                            ),
-                          );
-                        },
+                          },
                         ),
                       ),
                     );

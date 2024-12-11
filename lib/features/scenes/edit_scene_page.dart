@@ -25,10 +25,12 @@ class _EditScenePageState extends State<EditScenePage> {
 
     // Initialize controllers with current scene data
     _nameController = TextEditingController(text: widget.scene.name);
-    _descriptionController = TextEditingController(text: widget.scene.description);
+    _descriptionController =
+        TextEditingController(text: widget.scene.description);
     _moodController = TextEditingController(text: widget.scene.mood);
     _topicController = TextEditingController(text: widget.scene.topic);
-    _languageController = TextEditingController(text: widget.scene.language); // Initialize with language
+    _languageController = TextEditingController(
+        text: widget.scene.language); // Initialize with language
   }
 
   @override
@@ -94,13 +96,13 @@ class _EditScenePageState extends State<EditScenePage> {
       description: _descriptionController.text,
       mood: _moodController.text,
       topic: _topicController.text,
-      language: _languageController.text, 
+      language: _languageController.text,
     );
 
     // Use the ScenesController to update the scene via its repository
     final controller = Provider.of<ScenesController>(context, listen: false);
 
-    controller.saveScene(updatedScene).then((_) {
+    controller.saveScene(updatedScene, context).then((_) {
       // On successful update, navigate back
       Navigator.pop(context);
     }).catchError((error) {

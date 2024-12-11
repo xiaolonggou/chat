@@ -1,6 +1,7 @@
 // lib/features/scenes/mock_scenes_repository.dart
 
 import 'package:chat/features/scenes/scenes_repository.dart';
+import 'package:flutter/material.dart';
 import '../features/scenes/scene_model.dart';
 
 class MockScenesRepository implements ScenesRepository {
@@ -24,13 +25,14 @@ class MockScenesRepository implements ScenesRepository {
   ];
 
   @override
-  Future<List<Scene>> fetchScenes() async {
+  Future<List<Scene>> fetchScenes(BuildContext buildContext) async {
     await Future.delayed(const Duration(milliseconds: 500)); // Simulate delay
-    return List<Scene>.from(_scenes); // Return a copy to avoid direct modification
+    return List<Scene>.from(
+        _scenes); // Return a copy to avoid direct modification
   }
 
   @override
-  Future<void> saveScene(Scene scene) async {
+  Future<void> saveScene(Scene scene, BuildContext context) async {
     await Future.delayed(const Duration(milliseconds: 500)); // Simulate delay
     final index = _scenes.indexWhere((s) => s.id == scene.id);
     if (index != -1) {
@@ -46,7 +48,8 @@ class MockScenesRepository implements ScenesRepository {
   }
 
   @override
-  Future<void> deleteScene(int id) async { // Fixed method signature here
+  Future<void> deleteScene(int id, BuildContext context) async {
+    // Fixed method signature here
     await Future.delayed(const Duration(milliseconds: 500)); // Simulate delay
     _scenes.removeWhere((scene) => scene.id == id);
   }

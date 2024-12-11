@@ -24,11 +24,11 @@ class ScenesPage extends StatelessWidget {
           // Check if scenes are loading
           if (controller.isLoading) {
             return const Center(child: CircularProgressIndicator());
-          } 
+          }
           // Check if there's an error
           else if (controller.errorMessage != null) {
             return Center(child: Text('Error: ${controller.errorMessage}'));
-          } 
+          }
           // Display list of scenes
           else {
             return ScenesList(scenes: controller.scenes);
@@ -60,7 +60,8 @@ class AddSceneButton extends StatelessWidget {
               ),
             ),
           ),
-        ).then((_) => Provider.of<ScenesController>(context, listen: false).fetchScenes());
+        ).then((_) => Provider.of<ScenesController>(context, listen: false)
+            .fetchScenes(context));
       },
       backgroundColor: theme.colorScheme.inversePrimary,
       elevation: 0,
@@ -92,7 +93,8 @@ class SceneListItem extends StatelessWidget {
   final Scene scene;
   final bool isEven;
 
-  const SceneListItem({Key? key, required this.scene, required this.isEven}) : super(key: key);
+  const SceneListItem({Key? key, required this.scene, required this.isEven})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +111,7 @@ class SceneListItem extends StatelessWidget {
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           if (scene.id != null) {
-            controller.deleteScene(scene.id!);
+            controller.deleteScene(scene.id!, context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('${scene.name ?? 'Unnamed'} deleted')),
             );
@@ -134,9 +136,11 @@ class SceneListItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             title: Text(scene.name ?? 'Unnamed'), // Handle null name
-            subtitle: Text(scene.description ?? 'No description'), // Handle null description
+            subtitle: Text(scene.description ??
+                'No description'), // Handle null description
             trailing: IconButton(
               icon: Icon(Icons.edit, color: theme.colorScheme.primary),
               onPressed: () {
@@ -145,7 +149,7 @@ class SceneListItem extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => EditScenePage(scene: scene),
                   ),
-                ).then((_) => controller.fetchScenes());
+                ).then((_) => controller.fetchScenes(context));
               },
             ),
           ),

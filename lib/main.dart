@@ -19,7 +19,6 @@ import 'features/authentication/login_page.dart'; // Import LoginPage
 import 'shared/utils/token_storage.dart'; // Import TokenStorage for handling token
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   const String serverUrl = 'http://localhost:3000';
   final bool useMockData = await _shouldUseMockData(serverUrl);
@@ -35,7 +34,10 @@ void main() async {
   final chattersController = ChattersController(repository: chattersRepository);
   final scenesController = ScenesController(repository: scenesRepository);
   final chatService = ChatService(serverUrl: serverUrl);
-  final chatController = ChatsController(scenesController:scenesController, chattersController: chattersController, chatService: chatService);
+  final chatController = ChatsController(
+      scenesController: scenesController,
+      chattersController: chattersController,
+      chatService: chatService);
 
   runApp(MyApp(
     chattersController: chattersController,
@@ -70,7 +72,7 @@ class MyApp extends StatelessWidget {
     required this.useMockData,
   });
 
- @override
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
@@ -88,7 +90,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => LoginPage(
                 onLoginSuccess: () async {
-                  await _checkLoginStatus(context); // This can trigger navigation
+                  await _checkLoginStatus(
+                      context); // This can trigger navigation
                 },
               ),
           '/home': (context) => MyHomePage(),
@@ -97,19 +100,18 @@ class MyApp extends StatelessWidget {
     );
   }
 
-
   // Check if the user is logged in, and trigger fetchData if logged in
-Future<void> _checkLoginStatus(BuildContext context) async {
-  final token = await TokenStorage.retrieveToken();
-  if (token != null) {
-    Navigator.of(context).pushReplacementNamed('/home');
+  Future<void> _checkLoginStatus(BuildContext context) async {
+    final token = await TokenStorage.retrieveToken();
+    if (token != null) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
   }
-}
 
   // Fetch data for chatters and scenes
   Future<void> _fetchData(BuildContext context) async {
     await context.read<ChattersController>().fetchChatters();
-    await context.read<ScenesController>().fetchScenes();
+    await context.read<ScenesController>().fetchScenes(context);
   }
 }
 
@@ -149,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _fetchData() async {
     try {
       await context.read<ChattersController>().fetchChatters();
-      await context.read<ScenesController>().fetchScenes();
+      await context.read<ScenesController>().fetchScenes(context);
       setState(() {
         isLoading = false;
       });

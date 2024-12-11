@@ -29,7 +29,8 @@ class _AddChatPageState extends State<AddChatPage> {
   late Future<List<Chatter>> _chattersFuture;
 
   final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _meetingReasonController = TextEditingController();
+  final TextEditingController _meetingReasonController =
+      TextEditingController();
   final List<LocalChatter> _selectedChatters = [];
   Scene? _selectedScene;
 
@@ -37,7 +38,7 @@ class _AddChatPageState extends State<AddChatPage> {
   void initState() {
     super.initState();
 
-    _scenesFuture = widget.scenesController.repository.fetchScenes();
+    _scenesFuture = widget.scenesController.repository.fetchScenes(context);
     _chattersFuture = widget.chattersController.repository.fetchChatters();
 
     if (widget.chat != null) {
@@ -115,7 +116,8 @@ class _AddChatPageState extends State<AddChatPage> {
     );
 
     // Replace participants
-    await db.delete('chat_participants', where: 'chatId = ?', whereArgs: [widget.chat!.id]);
+    await db.delete('chat_participants',
+        where: 'chatId = ?', whereArgs: [widget.chat!.id]);
     for (final chatter in _selectedChatters) {
       await db.insert('chat_participants', {
         'chatId': widget.chat!.id,
@@ -130,7 +132,8 @@ class _AddChatPageState extends State<AddChatPage> {
 
   // Show a snackbar with a message
   void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   // Edit chatter's objective and mood
@@ -180,13 +183,16 @@ class _AddChatPageState extends State<AddChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.chat == null ? 'Add Chat' : 'Edit Chat')),
+      appBar:
+          AppBar(title: Text(widget.chat == null ? 'Add Chat' : 'Edit Chat')),
       body: FutureBuilder<List<Scene>>(
         future: _scenesFuture,
         builder: (context, sceneSnapshot) {
           if (sceneSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (sceneSnapshot.hasError || !sceneSnapshot.hasData || sceneSnapshot.data!.isEmpty) {
+          } else if (sceneSnapshot.hasError ||
+              !sceneSnapshot.hasData ||
+              sceneSnapshot.data!.isEmpty) {
             return const Center(child: Text('No scenes available.'));
           }
 
@@ -195,7 +201,9 @@ class _AddChatPageState extends State<AddChatPage> {
             builder: (context, chatterSnapshot) {
               if (chatterSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (chatterSnapshot.hasError || !chatterSnapshot.hasData || chatterSnapshot.data!.isEmpty) {
+              } else if (chatterSnapshot.hasError ||
+                  !chatterSnapshot.hasData ||
+                  chatterSnapshot.data!.isEmpty) {
                 return const Center(child: Text('No chatters available.'));
               }
 
@@ -206,9 +214,11 @@ class _AddChatPageState extends State<AddChatPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    _buildTextField(_subjectController, 'Subject', 'Enter chat subject'),
+                    _buildTextField(
+                        _subjectController, 'Subject', 'Enter chat subject'),
                     const SizedBox(height: 16),
-                    _buildTextField(_meetingReasonController, 'Reason for Meeting', 'Enter reason for meeting'),
+                    _buildTextField(_meetingReasonController,
+                        'Reason for Meeting', 'Enter reason for meeting'),
                     const SizedBox(height: 16),
                     _buildSceneDropdown(scenes),
                     const SizedBox(height: 16),
@@ -217,7 +227,8 @@ class _AddChatPageState extends State<AddChatPage> {
                     _buildSelectedChattersList(),
                     ElevatedButton(
                       onPressed: _saveChat,
-                      child: Text(widget.chat == null ? 'Create Chat' : 'Update Chat'),
+                      child: Text(
+                          widget.chat == null ? 'Create Chat' : 'Update Chat'),
                     ),
                   ],
                 ),
@@ -230,7 +241,8 @@ class _AddChatPageState extends State<AddChatPage> {
   }
 
   // Helper method for text fields
-  Widget _buildTextField(TextEditingController controller, String label, String hint) {
+  Widget _buildTextField(
+      TextEditingController controller, String label, String hint) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -268,7 +280,8 @@ class _AddChatPageState extends State<AddChatPage> {
       ),
       onChanged: (Chatter? chatter) {
         if (chatter != null) {
-          setState(() => _selectedChatters.add(LocalChatter.fromChatter(chatter)));
+          setState(
+              () => _selectedChatters.add(LocalChatter.fromChatter(chatter)));
         }
       },
       items: chatters.map((chatter) {
@@ -289,7 +302,8 @@ class _AddChatPageState extends State<AddChatPage> {
           final chatter = _selectedChatters[index];
           return ListTile(
             title: Text(chatter.name),
-            subtitle: Text('Objective: ${chatter.objective ?? "Not set"}, Mood: ${chatter.mood ?? "Not set"}'),
+            subtitle: Text(
+                'Objective: ${chatter.objective ?? "Not set"}, Mood: ${chatter.mood ?? "Not set"}'),
             trailing: IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {

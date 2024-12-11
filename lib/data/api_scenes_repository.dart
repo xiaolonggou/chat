@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:chat/data/ApiClient.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../features/scenes/scene_model.dart';
 import '../features/scenes/scenes_repository.dart';
@@ -22,30 +24,37 @@ class ApiScenesRepository implements ScenesRepository {
 
   // Private helper method to get the JWT token
   Future<String?> _getToken() async {
-    return await TokenStorage.retrieveToken(); // Retrieve the token from secure storage
+    return await TokenStorage
+        .retrieveToken(); // Retrieve the token from secure storage
   }
 
-  @override
-   Future<List<Scene>> fetchScenes() async {
+  Future<List<Scene>> fetchScenes(BuildContext context) async {
     final token = await TokenStorage.retrieveToken(); // Get the token
-    final response = await http.get(
-      Uri.parse('$baseUrl/scenes'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final client = ApiClient(baseUrl: baseUrl, context: context);
 
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((scene) => Scene.fromJson(scene)).toList();
-    } else {
-      throw Exception('Failed to fetch scenes');
+    try {
+      final response = await client.get(
+        'scenes',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((scene) => Scene.fromJson(scene)).toList();
+      } else {
+        throw Exception('Failed to fetch scenes: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching scenes: $e');
+      rethrow;
     }
   }
-  
+
   @override
-  Future<void> saveScene(Scene scene) async {
+  Future<void> saveScene(Scene scene, BuildContext context) async {
     final token = await _getToken(); // Get the token
     final Uri url = scene.id != null
         ? Uri.parse('$baseUrl/scenes/${scene.id}') // For existing scene
@@ -75,14 +84,15 @@ class ApiScenesRepository implements ScenesRepository {
   }
 
   @override
-  Future<void> deleteScene(int id) async {
+  Future<void> deleteScene(int id, BuildContext context) async {
     final token = await _getToken(); // Get the token
 
     final response = await http.delete(
       Uri.parse('$baseUrl/scenes/$id'),
       headers: {
         'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token', // Add Authorization header
+        if (token != null)
+          'Authorization': 'Bearer $token', // Add Authorization header
       },
     );
 
