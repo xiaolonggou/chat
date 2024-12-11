@@ -1,7 +1,6 @@
 // lib/features/scenes/scenes_controller.dart
 
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'scene_model.dart';
 import 'scenes_repository.dart';
 
